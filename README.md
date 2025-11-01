@@ -82,7 +82,7 @@ http://localhost:8000
 
 ## ファイル構成
 ```
-/src/
+/doc/
 ├── index.html          # メインアプリケーション
 ├── result.json         # 確定済み結果データ
 ├── package.json        # Node.js設定
