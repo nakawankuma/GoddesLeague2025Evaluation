@@ -1,0 +1,22 @@
+{
+  "name": "fivestar-gp-2025",
+  "version": "1.0.0",
+  "description": "FIVESTAR GP 2025 Tournament Bracket System",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "http-server . -p 8000 -c-1"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "keywords": [
+    "tournament",
+    "bracket",
+    "wrestling",
+    "fivestar-gp"
+  ],
+  "author": "",
+  "license": "MIT"
+}
