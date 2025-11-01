@@ -1,8 +1,7 @@
-# FIVESTAR GP 2025 Evaluation Tool
-5StarGrandPrixEvaluationTool
+# Goddes Tag League 2025 Evaluation Tool
 
 ## 概要
-5STAR GP 2025の対戦表管理システムです。試合結果の入力・管理、確定データの配布、個人予想のアップロード機能を提供します。
+Goddes Tag League 2025の対戦表管理システムです。試合結果の入力・管理、確定データの配布、個人予想のアップロード機能を提供します。
 今年の開催は完了しました。
 同様のリーグ戦でまた利用したいと思います。ご利用ありがとうございました。
 
