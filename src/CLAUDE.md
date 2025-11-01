@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-This is a web application for managing the FIVESTAR GP 2025 tournament bracket system. It's a single-page HTML application that allows users to:
+This is a web application for managing the Goddes Tag League 2025 tournament bracket system. It's a single-page HTML application that allows users to:
 - View tournament brackets for 4 blocks (Red Stars A/B, Blue Stars A/B)
 - Track match results by clicking on match cells
 - View individual player schedules via modal dialogs

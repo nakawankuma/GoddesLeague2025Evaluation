@@ -50,7 +50,7 @@ const server = http.createServer((req, res) => {
 const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, () => {
-  console.log(`🚀 FIVESTAR GP 2025 サーバーが起動しました`);
+  console.log(`🚀 Goddes Tag League 2025 Evaluation Tool サーバーが起動しました`);
   console.log(`📍 URL: http://localhost:${PORT}`);
   console.log(`📁 ファイル: ${path.resolve('./index.html')}`);
   console.log(`🛑 停止: Ctrl+C`);
