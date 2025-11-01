@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-This is a web application for managing the Goddes Tag League 2025 tournament bracket system. It's a single-page HTML application that allows users to:
+This is a web application for managing the FIVESTAR GP 2025 tournament bracket system. It's a single-page HTML application that allows users to:
 - View tournament brackets for 4 blocks (Red Stars A/B, Blue Stars A/B)
 - Track match results by clicking on match cells
 - View individual player schedules via modal dialogs
@@ -86,12 +86,6 @@ Since this is a static HTML application:
 - 残り作業がある場合には常にtodo.mdをメンテナンする
 - コードを追加したらテストコードを必ず作成する。t_wadaメソッドを利用する
 - ファイル、クラス、メソッドなどのコメントは必ず全て書くこと。
-- コミットについて
-    - コミットする前/dairy/yyyyMMdd.md に当日の実行結果を追加すること
-    - 既存の日報の内容は線を引いてその後ろに追記する
-    - /dairy/yyyyMMdd.md がgit addしていない場合には必ずする
-    - 変更箇所はできるだけまとめる
-    - git commitコメントに以下のフォーマットで書き込みをする
 
 [ユーザー依頼事項]
 {ユーザー依頼事項をまとめて書き込む}
