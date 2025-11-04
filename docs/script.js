@@ -1,8 +1,103 @@
+// トーナメントデータ定義
+const tournamentData = {
+    'red-goddesses': {
+        title: 'RED GODDESSES',
+        teams: [
+            '刀羅ナツコ&琉悪夏',
+            'なつぱい&安納サオリ',
+            '水森由菜&星来芽依',
+            '妃南&八神蘭奈',
+            '月山和香&梨杏',
+            'ボジラ&鉄アキラ',
+            '葉月&コグマ',
+            'Sareee&叶ミク'
+        ],
+        matches: [
+            // [team1_index, team2_index, date, venue]
+            [0, 1, '11.24', 'いわき'],
+            [0, 2, '11.26', '神田明神'],
+            [0, 3, '11.7', '後楽園'],
+            [0, 4, '11.16', '札幌'],
+            [0, 5, '11.23', '郡山'],
+            [0, 6, '11.28', '京都'],
+            [0, 7, '11.12', '仙台'],
+            [1, 2, '11.12', '仙台'],
+            [1, 3, '11.8', '群馬'],
+            [1, 4, '11.23', '郡山'],
+            [1, 5, '11.26', '神田明神'],
+            [1, 6, '11.7', '後楽園'],
+            [1, 7, '11.28', '京都'],
+            [2, 3, '11.16', '札幌'],
+            [2, 4, '11.13', '八戸'],
+            [2, 5, '11.9', '松本'],
+            [2, 6, '11.15', '札幌'],
+            [2, 7, '11.7', '後楽園'],
+            [3, 4, '11.15', '札幌'],
+            [3, 5, '11.24', 'いわき'],
+            [3, 6, '11.23', '郡山'],
+            [3, 7, '11.9', '松本'],
+            [4, 5, '11.28', '京都'],
+            [4, 6, '11.9', '松本'],
+            [4, 7, '11.8', '群馬'],
+            [5, 6, '11.8', '群馬'],
+            [5, 7, '11.13', '八戸'],
+            [6, 7, '11.26', '神田明神']
+        ],
+        restDays: [
+            // [team_index, date, venue]
+        ]
+    },
+    'blue-goddesses': {
+        title: 'BLUE GODDESSES',
+        teams: [
+            '飯田沙耶&ビー・プレストリー',
+            'さくらあや&玖麗さやか',
+            '朱里&鹿島沙希',
+            '壮麗亜美&レディ・C',
+            'HANAKO&X',
+            'AZM&天咲光由',
+            '鈴季すず&山下りな',
+            '小波&吏南'
+        ],
+        matches: [
+            [0, 1, '11.24', 'いわき'],
+            [0, 2, '11.8', '群馬'],
+            [0, 3, '11.12', '仙台'],
+            [0, 4, '11.16', '札幌'],
+            [0, 5, '11.7', '後楽園'],
+            [0, 6, '11.15', '札幌'],
+            [0, 7, '11.23', '郡山'],
+            [1, 2, '11.26', '神田明神'],
+            [1, 3, '11.15', '札幌'],
+            [1, 4, '11.8', '群馬'],
+            [1, 5, '11.28', '京都'],
+            [1, 6, '11.13', '八戸'],
+            [1, 7, '11.7', '後楽園'],
+            [2, 3, '11.23', '郡山'],
+            [2, 4, '11.28', '京都'],
+            [2, 5, '11.9', '松本'],
+            [2, 6, '11.7', '後楽園'],
+            [2, 7, '11.12', '仙台'],
+            [3, 4, '11.9', '松本'],
+            [3, 5, '11.26', '神田明神'],
+            [3, 6, '11.24', 'いわき'],
+            [3, 7, '11.16', '札幌'],
+            [4, 5, '11.24', 'いわき'],
+            [4, 6, '11.26', '神田明神'],
+            [4, 7, '11.15', '札幌'],
+            [5, 6, '11.8', '群馬'],
+            [5, 7, '11.13', '八戸'],
+            [6, 7, '11.28', '京都']
+        ],
+        restDays: []
+    }
+};
+
 // グローバルなmatchResultsオブジェクト
 let matchResults = {};
 let confirmedResults = {}; // 確定済み結果
 let predictedResults = {}; // 予想結果（確定データとは別管理）
-const blocks = ['red-a', 'red-b', 'blue-a', 'blue-b'];
+const blocks = ['red-goddesses', 'blue-goddesses'];
 
 // 選手名の正規化（吏南と更南を同じとして扱う）
 function normalizePlayerName(name) {
@@ -1038,68 +1133,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('Tournament boxes initialized:', document.querySelectorAll('.tournament-match-box').length);
     }, 1000);
     
-    blocks.forEach(blockId => {
-        const table = document.querySelector(`#${blockId} .schedule-table`);
-        if (!table) return;
-        const headerCells = table.querySelectorAll('thead th');
-        const players = Array.from(headerCells).map(th => th.textContent.trim()).slice(1, headerCells.length - 2);
-        const bodyRows = table.querySelectorAll('tbody tr');
-
-        bodyRows.forEach((row, rowIndex) => {
-            const rowPlayerName = players[rowIndex];
-            if (!rowPlayerName) return;
-            const cells = row.querySelectorAll('td');
-            const pointCell = cells[cells.length - 1];
-            if (pointCell.classList.contains('point-column')) {
-                pointCell.dataset.player = rowPlayerName;
-                // 新しい形式に変更済みの場合はスキップ
-                if (!pointCell.querySelector('.confirmed-points')) {
-                    pointCell.innerHTML = '<span class="confirmed-points">0</span>(<span class="predicted-points">0</span>)';
-                }
-            }
-
-            cells.forEach((cell, cellIndex) => {
-                if (cellIndex > 0 && cellIndex <= players.length) {
-                    const colPlayerName = players[cellIndex - 1];
-                    if (rowPlayerName === colPlayerName) {
-                        cell.classList.add('diagonal');
-                        return;
-                    }
-                    cell.classList.remove('diagonal');
-                    cell.classList.add('clickable-cell');
-                    cell.dataset.player1 = rowPlayerName;
-                    cell.dataset.player2 = colPlayerName;
-                    cell.dataset.block = blockId;
-                    if (cellIndex - 1 < rowIndex) {
-                        const upperCell = bodyRows[cellIndex - 1].querySelectorAll('td')[rowIndex + 1];
-                        const dateDiv = upperCell.querySelector('.date');
-                        const venueDiv = upperCell.querySelector('.venue');
-                        cell.innerHTML = '';
-                        if (dateDiv) cell.appendChild(dateDiv.cloneNode(true));
-                        if (venueDiv) cell.appendChild(venueDiv.cloneNode(true));
-                    }
-                    if (!cell.querySelector('.match-results')) {
-                        cell.insertAdjacentHTML('beforeend', '<div class="match-results"><div class="confirmed-result"></div><div class="predicted-result"></div></div>');
-                    }
-                }
-            });
-        });
-    });
-
-    document.querySelectorAll('.clickable-cell').forEach(cell => {
-        cell.addEventListener('click', function() { toggleMatchResult(this); });
-    });
-
-    document.querySelectorAll('.player-name, thead th').forEach(cell => {
-        const playerName = cell.textContent.trim();
-        if (playerName && !cell.classList.contains('rest-column') && !cell.classList.contains('point-column')) {
-            cell.style.cursor = 'pointer';
-            cell.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showPlayerSchedule(playerName);
-            });
-        }
-    });
 
     const scheduleModal = document.getElementById('schedule-modal');
     const scheduleModalClose = scheduleModal.querySelector('.modal-close');
@@ -1223,7 +1256,159 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // 確定データ読み込み後にテーブルを更新
     refreshAllTables();
-    
+
     // 初期状態で優勝者表示をチェック
     updateChampionDisplay();
+
+    // テーブルを動的生成
+    generateTables();
+
+    // 日付・会場対応表を動的生成
+    generateVenueScheduleTable();
 });
+
+// テーブル動的生成関数
+function generateTables() {
+    blocks.forEach(blockId => {
+        const blockData = tournamentData[blockId];
+        if (!blockData) return;
+
+        const container = document.getElementById(blockId);
+        if (!container) return;
+
+        // テーブルHTMLを生成
+        const tableHTML = generateBlockTable(blockId, blockData);
+        container.innerHTML = tableHTML;
+    });
+
+    // 動的生成されたセルにイベントリスナーを追加
+    document.querySelectorAll('.clickable-cell').forEach(cell => {
+        cell.addEventListener('click', function() { toggleMatchResult(this); });
+    });
+
+    // チーム名クリックでスケジュール表示
+    document.querySelectorAll('.player-name, thead th').forEach(cell => {
+        const playerName = cell.textContent.trim();
+        if (playerName && !cell.classList.contains('rest-column') && !cell.classList.contains('point-column')) {
+            cell.style.cursor = 'pointer';
+            cell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showPlayerSchedule(playerName);
+            });
+        }
+    });
+}
+
+function generateBlockTable(blockId, blockData) {
+    const { title, teams, matches } = blockData;
+    const colorClass = blockId.includes('red') ? 'red' : 'blue';
+
+    // ヘッダー生成
+    let html = `
+        <div class="block-title ${colorClass}-title">${title}</div>
+        <div id="${blockId}-status" class="block-status"></div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th class="${colorClass}-header"></th>`;
+
+    teams.forEach(team => {
+        html += `<th class="${colorClass}-header">${team}</th>`;
+    });
+
+    html += `
+                    <th class="${colorClass}-header rest-column">休み</th>
+                    <th class="${colorClass}-header point-column">勝ち点（予想）</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    // 対戦マトリックス生成
+    teams.forEach((team1, i) => {
+        html += `<tr><td class="player-name ${colorClass}-player">${team1}</td>`;
+
+        teams.forEach((team2, j) => {
+            if (i === j) {
+                html += `<td class="diagonal"></td>`;
+            } else {
+                const match = findMatch(matches, i, j);
+                if (match) {
+                    const [t1, t2, date, venue] = match;
+                    const isClickable = (i < j); // 上三角のみクリック可能
+                    const clickableClass = isClickable ? 'clickable-cell' : '';
+                    const dataAttrs = isClickable ?
+                        `data-player1="${team1}" data-player2="${team2}" data-block="${blockId}"` : '';
+
+                    html += `<td class="match-info ${clickableClass}" ${dataAttrs}>
+                        <div class="date">${date}</div>
+                        <div class="venue">${venue}</div>
+                        ${isClickable ? `<div class="match-results">
+                            <div class="confirmed-result"></div>
+                            <div class="predicted-result"></div>
+                        </div>` : ''}
+                    </td>`;
+                } else {
+                    html += `<td class="match-info"></td>`;
+                }
+            }
+        });
+
+        html += `
+            <td class="rest-column match-info"></td>
+            <td class="point-column" data-player="${team1}">
+                <span class="confirmed-points">0</span>(<span class="predicted-points">0</span>)
+            </td>
+        </tr>`;
+    });
+
+    html += `
+            </tbody>
+        </table>`;
+
+    return html;
+}
+
+function findMatch(matches, i, j) {
+    // マッチデータから該当する対戦を検索
+    return matches.find(m =>
+        (m[0] === i && m[1] === j) || (m[0] === j && m[1] === i)
+    );
+}
+// 日付・会場対応表を動的生成する関数
+function generateVenueScheduleTable() {
+    const venueMap = new Map(); // {date: venue} のマップ
+
+    // 全ブロックから日付・会場情報を収集
+    blocks.forEach(blockId => {
+        const blockData = tournamentData[blockId];
+        if (!blockData) return;
+
+        blockData.matches.forEach(match => {
+            const [t1, t2, date, venue] = match;
+            venueMap.set(date, venue);
+        });
+    });
+
+    // 日付でソート
+    const sortedDates = Array.from(venueMap.keys()).sort((a, b) => {
+        const [monthA, dayA] = a.split('.').map(Number);
+        const [monthB, dayB] = b.split('.').map(Number);
+        return monthA === monthB ? dayA - dayB : monthA - monthB;
+    });
+
+    // テーブルHTML生成
+    let html = '';
+    sortedDates.forEach(date => {
+        const venue = venueMap.get(date);
+        html += `<tr>
+            <td>${date}</td>
+            <td onclick="showVenueSchedule('${venue}', '${date}')" style="cursor: pointer;">${venue}</td>
+        </tr>`;
+    });
+
+    // DOMに挿入
+    const tbody = document.querySelector('.venue-list-section tbody');
+    if (tbody) {
+        tbody.innerHTML = html;
+    }
+}
