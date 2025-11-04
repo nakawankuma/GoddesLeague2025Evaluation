@@ -1133,68 +1133,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('Tournament boxes initialized:', document.querySelectorAll('.tournament-match-box').length);
     }, 1000);
     
-    blocks.forEach(blockId => {
-        const table = document.querySelector(`#${blockId} .schedule-table`);
-        if (!table) return;
-        const headerCells = table.querySelectorAll('thead th');
-        const players = Array.from(headerCells).map(th => th.textContent.trim()).slice(1, headerCells.length - 2);
-        const bodyRows = table.querySelectorAll('tbody tr');
-
-        bodyRows.forEach((row, rowIndex) => {
-            const rowPlayerName = players[rowIndex];
-            if (!rowPlayerName) return;
-            const cells = row.querySelectorAll('td');
-            const pointCell = cells[cells.length - 1];
-            if (pointCell.classList.contains('point-column')) {
-                pointCell.dataset.player = rowPlayerName;
-                // 新しい形式に変更済みの場合はスキップ
-                if (!pointCell.querySelector('.confirmed-points')) {
-                    pointCell.innerHTML = '<span class="confirmed-points">0</span>(<span class="predicted-points">0</span>)';
-                }
-            }
-
-            cells.forEach((cell, cellIndex) => {
-                if (cellIndex > 0 && cellIndex <= players.length) {
-                    const colPlayerName = players[cellIndex - 1];
-                    if (rowPlayerName === colPlayerName) {
-                        cell.classList.add('diagonal');
-                        return;
-                    }
-                    cell.classList.remove('diagonal');
-                    cell.classList.add('clickable-cell');
-                    cell.dataset.player1 = rowPlayerName;
-                    cell.dataset.player2 = colPlayerName;
-                    cell.dataset.block = blockId;
-                    if (cellIndex - 1 < rowIndex) {
-                        const upperCell = bodyRows[cellIndex - 1].querySelectorAll('td')[rowIndex + 1];
-                        const dateDiv = upperCell.querySelector('.date');
-                        const venueDiv = upperCell.querySelector('.venue');
-                        cell.innerHTML = '';
-                        if (dateDiv) cell.appendChild(dateDiv.cloneNode(true));
-                        if (venueDiv) cell.appendChild(venueDiv.cloneNode(true));
-                    }
-                    if (!cell.querySelector('.match-results')) {
-                        cell.insertAdjacentHTML('beforeend', '<div class="match-results"><div class="confirmed-result"></div><div class="predicted-result"></div></div>');
-                    }
-                }
-            });
-        });
-    });
-
-    document.querySelectorAll('.clickable-cell').forEach(cell => {
-        cell.addEventListener('click', function() { toggleMatchResult(this); });
-    });
-
-    document.querySelectorAll('.player-name, thead th').forEach(cell => {
-        const playerName = cell.textContent.trim();
-        if (playerName && !cell.classList.contains('rest-column') && !cell.classList.contains('point-column')) {
-            cell.style.cursor = 'pointer';
-            cell.addEventListener('click', (e) => {
-                e.stopPropagation();
-                showPlayerSchedule(playerName);
-            });
-        }
-    });
 
     const scheduleModal = document.getElementById('schedule-modal');
     const scheduleModalClose = scheduleModal.querySelector('.modal-close');
@@ -1324,6 +1262,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // テーブルを動的生成
     generateTables();
+
+    // 日付・会場対応表を動的生成
+    generateVenueScheduleTable();
 });
 
 // テーブル動的生成関数
@@ -1338,6 +1279,23 @@ function generateTables() {
         // テーブルHTMLを生成
         const tableHTML = generateBlockTable(blockId, blockData);
         container.innerHTML = tableHTML;
+    });
+
+    // 動的生成されたセルにイベントリスナーを追加
+    document.querySelectorAll('.clickable-cell').forEach(cell => {
+        cell.addEventListener('click', function() { toggleMatchResult(this); });
+    });
+
+    // チーム名クリックでスケジュール表示
+    document.querySelectorAll('.player-name, thead th').forEach(cell => {
+        const playerName = cell.textContent.trim();
+        if (playerName && !cell.classList.contains('rest-column') && !cell.classList.contains('point-column')) {
+            cell.style.cursor = 'pointer';
+            cell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showPlayerSchedule(playerName);
+            });
+        }
     });
 }
 
@@ -1415,4 +1373,42 @@ function findMatch(matches, i, j) {
     return matches.find(m =>
         (m[0] === i && m[1] === j) || (m[0] === j && m[1] === i)
     );
+}
+// 日付・会場対応表を動的生成する関数
+function generateVenueScheduleTable() {
+    const venueMap = new Map(); // {date: venue} のマップ
+
+    // 全ブロックから日付・会場情報を収集
+    blocks.forEach(blockId => {
+        const blockData = tournamentData[blockId];
+        if (!blockData) return;
+
+        blockData.matches.forEach(match => {
+            const [t1, t2, date, venue] = match;
+            venueMap.set(date, venue);
+        });
+    });
+
+    // 日付でソート
+    const sortedDates = Array.from(venueMap.keys()).sort((a, b) => {
+        const [monthA, dayA] = a.split('.').map(Number);
+        const [monthB, dayB] = b.split('.').map(Number);
+        return monthA === monthB ? dayA - dayB : monthA - monthB;
+    });
+
+    // テーブルHTML生成
+    let html = '';
+    sortedDates.forEach(date => {
+        const venue = venueMap.get(date);
+        html += `<tr>
+            <td>${date}</td>
+            <td onclick="showVenueSchedule('${venue}', '${date}')" style="cursor: pointer;">${venue}</td>
+        </tr>`;
+    });
+
+    // DOMに挿入
+    const tbody = document.querySelector('.venue-list-section tbody');
+    if (tbody) {
+        tbody.innerHTML = html;
+    }
 }
