@@ -1,8 +1,103 @@
+// トーナメントデータ定義
+const tournamentData = {
+    'red-goddesses': {
+        title: 'RED GODDESSES',
+        teams: [
+            '刀羅ナツコ&琉悪夏',
+            'なつぱい&安納サオリ',
+            '水森由菜&星来芽依',
+            '妃南&八神蘭奈',
+            '月山和香&梨杏',
+            'ボジラ&鉄アキラ',
+            '葉月&コグマ',
+            'Sareee&叶ミク'
+        ],
+        matches: [
+            // [team1_index, team2_index, date, venue]
+            [0, 1, '11.24', 'いわき'],
+            [0, 2, '11.26', '神田明神'],
+            [0, 3, '11.7', '後楽園'],
+            [0, 4, '11.16', '札幌'],
+            [0, 5, '11.23', '郡山'],
+            [0, 6, '11.28', '京都'],
+            [0, 7, '11.12', '仙台'],
+            [1, 2, '11.12', '仙台'],
+            [1, 3, '11.8', '群馬'],
+            [1, 4, '11.23', '郡山'],
+            [1, 5, '11.26', '神田明神'],
+            [1, 6, '11.7', '後楽園'],
+            [1, 7, '11.28', '京都'],
+            [2, 3, '11.16', '札幌'],
+            [2, 4, '11.13', '八戸'],
+            [2, 5, '11.9', '松本'],
+            [2, 6, '11.15', '札幌'],
+            [2, 7, '11.7', '後楽園'],
+            [3, 4, '11.15', '札幌'],
+            [3, 5, '11.24', 'いわき'],
+            [3, 6, '11.23', '郡山'],
+            [3, 7, '11.9', '松本'],
+            [4, 5, '11.28', '京都'],
+            [4, 6, '11.9', '松本'],
+            [4, 7, '11.8', '群馬'],
+            [5, 6, '11.8', '群馬'],
+            [5, 7, '11.13', '八戸'],
+            [6, 7, '11.26', '神田明神']
+        ],
+        restDays: [
+            // [team_index, date, venue]
+        ]
+    },
+    'blue-goddesses': {
+        title: 'BLUE GODDESSES',
+        teams: [
+            '飯田沙耶&ビー・プレストリー',
+            'さくらあや&玖麗さやか',
+            '朱里&鹿島沙希',
+            '壮麗亜美&レディ・C',
+            'HANAKO&X',
+            'AZM&天咲光由',
+            '鈴季すず&山下りな',
+            '小波&吏南'
+        ],
+        matches: [
+            [0, 1, '11.24', 'いわき'],
+            [0, 2, '11.8', '群馬'],
+            [0, 3, '11.12', '仙台'],
+            [0, 4, '11.16', '札幌'],
+            [0, 5, '11.7', '後楽園'],
+            [0, 6, '11.15', '札幌'],
+            [0, 7, '11.23', '郡山'],
+            [1, 2, '11.26', '神田明神'],
+            [1, 3, '11.15', '札幌'],
+            [1, 4, '11.8', '群馬'],
+            [1, 5, '11.28', '京都'],
+            [1, 6, '11.13', '八戸'],
+            [1, 7, '11.7', '後楽園'],
+            [2, 3, '11.23', '郡山'],
+            [2, 4, '11.28', '京都'],
+            [2, 5, '11.9', '松本'],
+            [2, 6, '11.7', '後楽園'],
+            [2, 7, '11.12', '仙台'],
+            [3, 4, '11.9', '松本'],
+            [3, 5, '11.26', '神田明神'],
+            [3, 6, '11.24', 'いわき'],
+            [3, 7, '11.16', '札幌'],
+            [4, 5, '11.24', 'いわき'],
+            [4, 6, '11.26', '神田明神'],
+            [4, 7, '11.15', '札幌'],
+            [5, 6, '11.8', '群馬'],
+            [5, 7, '11.13', '八戸'],
+            [6, 7, '11.28', '京都']
+        ],
+        restDays: []
+    }
+};
+
 // グローバルなmatchResultsオブジェクト
 let matchResults = {};
 let confirmedResults = {}; // 確定済み結果
 let predictedResults = {}; // 予想結果（確定データとは別管理）
-const blocks = ['red-a', 'red-b', 'blue-a', 'blue-b'];
+const blocks = ['red-goddesses', 'blue-goddesses'];
 
 // 選手名の正規化（吏南と更南を同じとして扱う）
 function normalizePlayerName(name) {
@@ -1223,7 +1318,101 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // 確定データ読み込み後にテーブルを更新
     refreshAllTables();
-    
+
     // 初期状態で優勝者表示をチェック
     updateChampionDisplay();
+
+    // テーブルを動的生成
+    generateTables();
 });
+
+// テーブル動的生成関数
+function generateTables() {
+    blocks.forEach(blockId => {
+        const blockData = tournamentData[blockId];
+        if (!blockData) return;
+
+        const container = document.getElementById(blockId);
+        if (!container) return;
+
+        // テーブルHTMLを生成
+        const tableHTML = generateBlockTable(blockId, blockData);
+        container.innerHTML = tableHTML;
+    });
+}
+
+function generateBlockTable(blockId, blockData) {
+    const { title, teams, matches } = blockData;
+    const colorClass = blockId.includes('red') ? 'red' : 'blue';
+
+    // ヘッダー生成
+    let html = `
+        <div class="block-title ${colorClass}-title">${title}</div>
+        <div id="${blockId}-status" class="block-status"></div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th class="${colorClass}-header"></th>`;
+
+    teams.forEach(team => {
+        html += `<th class="${colorClass}-header">${team}</th>`;
+    });
+
+    html += `
+                    <th class="${colorClass}-header rest-column">休み</th>
+                    <th class="${colorClass}-header point-column">勝ち点（予想）</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    // 対戦マトリックス生成
+    teams.forEach((team1, i) => {
+        html += `<tr><td class="player-name ${colorClass}-player">${team1}</td>`;
+
+        teams.forEach((team2, j) => {
+            if (i === j) {
+                html += `<td class="diagonal"></td>`;
+            } else {
+                const match = findMatch(matches, i, j);
+                if (match) {
+                    const [t1, t2, date, venue] = match;
+                    const isClickable = (i < j); // 上三角のみクリック可能
+                    const clickableClass = isClickable ? 'clickable-cell' : '';
+                    const dataAttrs = isClickable ?
+                        `data-player1="${team1}" data-player2="${team2}" data-block="${blockId}"` : '';
+
+                    html += `<td class="match-info ${clickableClass}" ${dataAttrs}>
+                        <div class="date">${date}</div>
+                        <div class="venue">${venue}</div>
+                        ${isClickable ? `<div class="match-results">
+                            <div class="confirmed-result"></div>
+                            <div class="predicted-result"></div>
+                        </div>` : ''}
+                    </td>`;
+                } else {
+                    html += `<td class="match-info"></td>`;
+                }
+            }
+        });
+
+        html += `
+            <td class="rest-column match-info"></td>
+            <td class="point-column" data-player="${team1}">
+                <span class="confirmed-points">0</span>(<span class="predicted-points">0</span>)
+            </td>
+        </tr>`;
+    });
+
+    html += `
+            </tbody>
+        </table>`;
+
+    return html;
+}
+
+function findMatch(matches, i, j) {
+    // マッチデータから該当する対戦を検索
+    return matches.find(m =>
+        (m[0] === i && m[1] === j) || (m[0] === j && m[1] === i)
+    );
+}
