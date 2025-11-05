@@ -292,8 +292,24 @@ function toggleMatchResult(cell) {
     console.log('セルを更新:', matchKey, matchResults[matchKey]);
     updateCellDisplay(cell, matchResults[matchKey], 'predicted');
 
-    const opponentCell = document.querySelector(`[data-player1="${player2}"][data-player2="${player1}"][data-block="${block}"]`);
-    console.log('対応するセルを検索:', `[data-player1="${player2}"][data-player2="${player1}"][data-block="${block}"]`);
+    // セレクタではなく、すべてのセルをループして対応するセルを探す
+    console.log('対応するセルを検索:', player2, player1, block);
+    let opponentCell = null;
+    const allCells = document.querySelectorAll(`#${block} .clickable-cell`);
+    console.log('検索対象セル数:', allCells.length);
+
+    for (const testCell of allCells) {
+        const testP1 = normalizePlayerName(testCell.dataset.player1);
+        const testP2 = normalizePlayerName(testCell.dataset.player2);
+        const testBlock = testCell.dataset.block;
+
+        if (testP1 === player2 && testP2 === player1 && testBlock === block) {
+            opponentCell = testCell;
+            console.log('対応するセルを発見:', testP1, testP2);
+            break;
+        }
+    }
+
     console.log('対応するセル:', opponentCell);
     if (opponentCell) {
         console.log('対応するセルを更新:', reverseKey, matchResults[reverseKey]);
