@@ -793,21 +793,26 @@ function showVenueSchedule(venueName, date) {
     });
 
     // トーナメントの試合を収集
+    // トーナメント試合の日程と会場
     const tournamentSlots = {
-        '8.20': [
-            { type: '予選', p1_id: 'bracket-blue-a-3-name', p2_id: 'bracket-blue-b-2-name', venue: '後楽園', match_id: 'blue-prelim1' },
-            { type: '予選', p1_id: 'bracket-blue-a-2-name', p2_id: 'bracket-blue-b-3-name', venue: '後楽園', match_id: 'blue-prelim2' },
-            { type: '予選', p1_id: 'bracket-red-a-3-name', p2_id: 'bracket-red-b-2-name', venue: '後楽園', match_id: 'red-prelim1' },
-            { type: '予選', p1_id: 'bracket-red-a-2-name', p2_id: 'bracket-red-b-3-name', venue: '後楽園', match_id: 'red-prelim2' },
-            { type: '準々決勝', p1_id: 'bracket-blue-a-1-name', p2_id: 'blue-prelim1-winner', venue: '後楽園', match_id: 'blue-qf1' },
-            { type: '準々決勝', p1_id: 'bracket-blue-b-1-name', p2_id: 'blue-prelim2-winner', venue: '後楽園', match_id: 'blue-qf2' },
-            { type: '準々決勝', p1_id: 'bracket-red-a-1-name', p2_id: 'red-prelim1-winner', venue: '後楽園', match_id: 'red-qf1' },
-            { type: '準々決勝', p1_id: 'bracket-red-b-1-name', p2_id: 'red-prelim2-winner', venue: '後楽園', match_id: 'red-qf2' },
+        '11.29': [
+            // 予選4試合
+            { type: '予選', p1_id: 'bracket-red-a-3-name', p2_id: 'bracket-red-b-2-name', venue: '大阪', match_id: 'red-prelim1' },
+            { type: '予選', p1_id: 'bracket-red-a-2-name', p2_id: 'bracket-red-b-3-name', venue: '大阪', match_id: 'red-prelim2' },
+            { type: '予選', p1_id: 'bracket-blue-a-3-name', p2_id: 'bracket-blue-b-2-name', venue: '大阪', match_id: 'blue-prelim1' },
+            { type: '予選', p1_id: 'bracket-blue-a-2-name', p2_id: 'bracket-blue-b-3-name', venue: '大阪', match_id: 'blue-prelim2' },
+            // 準々決勝4試合
+            { type: '準々決勝', p1_id: 'bracket-red-a-1-name', p2_id: 'red-prelim1-winner', venue: '大阪', match_id: 'red-qf1' },
+            { type: '準々決勝', p1_id: 'bracket-red-b-1-name', p2_id: 'red-prelim2-winner', venue: '大阪', match_id: 'red-qf2' },
+            { type: '準々決勝', p1_id: 'bracket-blue-a-1-name', p2_id: 'blue-prelim1-winner', venue: '大阪', match_id: 'blue-qf1' },
+            { type: '準々決勝', p1_id: 'bracket-blue-b-1-name', p2_id: 'blue-prelim2-winner', venue: '大阪', match_id: 'blue-qf2' },
         ],
-        '8.23': [
-            { type: '準決勝', p1_id: 'blue-qf1-winner', p2_id: 'blue-qf2-winner', venue: '大田区', match_id: 'blue-sf' },
-            { type: '準決勝', p1_id: 'red-qf1-winner', p2_id: 'red-qf2-winner', venue: '大田区', match_id: 'red-sf' },
-            { type: '決勝', p1_id: 'blue-sf-winner', p2_id: 'red-sf-winner', venue: '大田区', match_id: 'final' },
+        '11.30': [
+            // 準決勝2試合
+            { type: '準決勝', p1_id: 'red-qf1-winner', p2_id: 'red-qf2-winner', venue: '浜松', match_id: 'red-sf' },
+            { type: '準決勝', p1_id: 'blue-qf1-winner', p2_id: 'blue-qf2-winner', venue: '浜松', match_id: 'blue-sf' },
+            // 決勝1試合
+            { type: '決勝', p1_id: 'red-sf-winner', p2_id: 'blue-sf-winner', venue: '浜松', match_id: 'final' },
         ]
     };
 
@@ -1617,7 +1622,7 @@ function findMatch(matches, i, j) {
 function generateVenueScheduleTable() {
     const venueMap = new Map(); // {date: venue} のマップ
 
-    // 全ブロックから日付・会場情報を収集
+    // 全ブロックから日付・会場情報を収集（リーグ戦）
     blocks.forEach(blockId => {
         const blockData = tournamentData[blockId];
         if (!blockData) return;
@@ -1627,6 +1632,10 @@ function generateVenueScheduleTable() {
             venueMap.set(date, venue);
         });
     });
+
+    // トーナメント日程を追加
+    venueMap.set('11.29', '大阪');
+    venueMap.set('11.30', '浜松');
 
     // 日付でソート
     const sortedDates = Array.from(venueMap.keys()).sort((a, b) => {
