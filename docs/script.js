@@ -369,9 +369,19 @@ function isBlockComplete(block) {
     return completedMatches >= totalMatches;
 }
 
+/**
+ * ブロック内の全選手を取得
+ * @param {string} block - ブロックID（red-goddesses / blue-goddesses）
+ * @returns {Array<string>} 選手名の配列
+ */
 function getPlayersInBlock(block) {
-    const headerCells = document.querySelectorAll(`#${block} .schedule-table thead th`);
-    return Array.from(headerCells).map(th => normalizePlayerName(th.textContent.trim())).slice(1, headerCells.length - 2);
+    // tournamentDataから直接取得（DOMに依存しない）
+    const blockData = tournamentData[block];
+    if (!blockData || !blockData.teams) {
+        console.error(`ブロックデータが見つかりません: ${block}`);
+        return [];
+    }
+    return blockData.teams.map(team => normalizePlayerName(team));
 }
 
 function determineBlockRankings(block) {
@@ -414,9 +424,19 @@ function determineBlockRankings(block) {
     return playerStats;
 }
 
+/**
+ * トーナメントブラケットの選手情報を更新
+ * @param {string} block - ブロックID（red-a, red-b, blue-a, blue-b）
+ * @param {Array<Object>} rankings - 順位データ
+ */
 function updateTournamentBracket(block, rankings) {
     const blockShort = block.split('-')[0]; // red or blue
     const blockSub = block.split('-')[1]; // a or b
+
+    if (!blockShort || !blockSub) {
+        console.error(`無効なブロックID: ${block}`);
+        return;
+    }
 
     const playerMap = {};
     rankings.forEach(p => {
@@ -428,16 +448,20 @@ function updateTournamentBracket(block, rankings) {
     ranks.forEach(rank => {
         const nameElement = document.getElementById(`bracket-${blockShort}-${blockSub}-${rank}-name`);
         const rankElement = document.getElementById(`bracket-${blockShort}-${blockSub}-${rank}-rank`);
-        if (nameElement && rankElement) {
-            const player = rankings.find(p => p.rank === rank);
-            if (player) {
-                // ブロック名と選手名を両方表示
-                nameElement.textContent = `${blockShort.toUpperCase()} STARS ${blockSub.toUpperCase()}`;
-                rankElement.textContent = `${rank}位 ${player.name}`;
-            } else {
-                nameElement.textContent = `${blockShort.toUpperCase()} STARS ${blockSub.toUpperCase()}`;
-                rankElement.textContent = `${rank}位`;
-            }
+
+        if (!nameElement || !rankElement) {
+            console.warn(`トーナメント要素が見つかりません: bracket-${blockShort}-${blockSub}-${rank}`);
+            return;
+        }
+
+        const player = rankings.find(p => p.rank === rank);
+        if (player) {
+            // ブロック名と選手名を両方表示
+            nameElement.textContent = `${blockShort.toUpperCase()} STARS ${blockSub.toUpperCase()}`;
+            rankElement.textContent = `${rank}位 ${player.name}`;
+        } else {
+            nameElement.textContent = `${blockShort.toUpperCase()} STARS ${blockSub.toUpperCase()}`;
+            rankElement.textContent = `${rank}位`;
         }
     });
 }
