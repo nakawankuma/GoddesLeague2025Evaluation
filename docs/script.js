@@ -239,14 +239,21 @@ function toggleMatchResult(cell) {
         statusEl.textContent = '';
     }
 
-    // 既存の結果を取得（matchKeyまたはreverseKeyから）
+    // 既存の結果を取得
+    const isReverse = cell.dataset.reverse === 'true';
     let currentResult = 'none';
 
     if (predictedResults[matchKey]) {
         currentResult = predictedResults[matchKey];
-        console.log('matchKeyから取得:', currentResult);
+        // 下三角のセルでは結果を反転して取得
+        if (isReverse) {
+            if (currentResult === 'win') currentResult = 'lose';
+            else if (currentResult === 'lose') currentResult = 'win';
+            // draw は そのまま
+        }
+        console.log('matchKeyから取得:', predictedResults[matchKey], isReverse ? '(反転)' : '', '->', currentResult);
     } else if (predictedResults[reverseKey]) {
-        // reverseKeyに結果がある場合は、結果を反転して使用
+        // reverseKeyに結果がある場合（後方互換性のため）
         const reverseResult = predictedResults[reverseKey];
         if (reverseResult === 'win') currentResult = 'lose';
         else if (reverseResult === 'lose') currentResult = 'win';
@@ -264,22 +271,30 @@ function toggleMatchResult(cell) {
         case 'draw': newResult = 'lose'; break;
         default: newResult = null; break;
     }
-    console.log('新しい結果:', currentResult, '->', newResult);
+    console.log('新しい結果（セル視点）:', currentResult, '->', newResult);
 
-    // 結果を保存（常にmatchKeyとreverseKeyの両方に保存）
-    if (newResult) {
-        predictedResults[matchKey] = newResult;
-        matchResults[matchKey] = newResult;
+    // 結果を保存（下三角の場合は反転して保存）
+    let resultToSave = newResult;
+    if (isReverse && resultToSave) {
+        if (resultToSave === 'win') resultToSave = 'lose';
+        else if (resultToSave === 'lose') resultToSave = 'win';
+        // draw は そのまま
+        console.log('下三角なので保存時に反転:', newResult, '->', resultToSave);
+    }
 
-        // 逆の結果も保存
+    if (resultToSave) {
+        predictedResults[matchKey] = resultToSave;
+        matchResults[matchKey] = resultToSave;
+
+        // 逆の結果も保存（後方互換性のため）
         let oppositeResult;
-        if (newResult === 'win') oppositeResult = 'lose';
-        else if (newResult === 'lose') oppositeResult = 'win';
+        if (resultToSave === 'win') oppositeResult = 'lose';
+        else if (resultToSave === 'lose') oppositeResult = 'win';
         else oppositeResult = 'draw'; // draw
 
         predictedResults[reverseKey] = oppositeResult;
         matchResults[reverseKey] = oppositeResult;
-        console.log('保存:', matchKey, '=', newResult, ',', reverseKey, '=', oppositeResult);
+        console.log('保存:', matchKey, '=', resultToSave, ',', reverseKey, '=', oppositeResult);
     } else {
         // 結果を削除
         delete predictedResults[matchKey];
@@ -292,9 +307,8 @@ function toggleMatchResult(cell) {
     console.log('セルを更新:', matchKey, matchResults[matchKey]);
     updateCellDisplay(cell, matchResults[matchKey], 'predicted');
 
-    // セレクタではなく、すべてのセルをループして対応するセルを探す
-    console.log('対応するセルを検索:', player2, player1, block);
-    let opponentCell = null;
+    // すべてのセルを更新（同じmatchKeyを持つセルをすべて更新）
+    console.log('同じ対戦の全セルを更新:', matchKey);
     const allCells = document.querySelectorAll(`#${block} .clickable-cell`);
     console.log('検索対象セル数:', allCells.length);
 
@@ -302,32 +316,15 @@ function toggleMatchResult(cell) {
         const testP1 = normalizePlayerName(testCell.dataset.player1);
         const testP2 = normalizePlayerName(testCell.dataset.player2);
         const testBlock = testCell.dataset.block;
+        const testMatchKey = `${testBlock}-${testP1}-${testP2}`;
 
-        // デバッグ: 最初の3つのセルと、マッチしそうなセルをログ出力
-        const shouldLog = (testP1 && testP1.includes('なつぱい')) || (testP2 && testP2.includes('なつぱい'));
-        if (shouldLog) {
-            console.log('  チェック中:', { testP1, testP2, testBlock });
-            console.log('  比較:', {
-                'testP1 === player2': testP1 === player2,
-                'testP2 === player1': testP2 === player1,
-                'testBlock === block': testBlock === block
-            });
-        }
-
-        if (testP1 === player2 && testP2 === player1 && testBlock === block) {
-            opponentCell = testCell;
-            console.log('対応するセルを発見:', testP1, testP2);
-            break;
+        // 同じmatchKeyを持つセル（クリックしたセル以外）を更新
+        if (testMatchKey === matchKey && testCell !== cell) {
+            console.log('対応するセルを発見して更新:', testP1, testP2);
+            updateCellDisplay(testCell, matchResults[matchKey], 'predicted');
         }
     }
 
-    console.log('対応するセル:', opponentCell);
-    if (opponentCell) {
-        console.log('対応するセルを更新:', reverseKey, matchResults[reverseKey]);
-        updateCellDisplay(opponentCell, matchResults[reverseKey], 'predicted');
-    } else {
-        console.log('対応するセルが見つかりません！');
-    }
     updatePoints(block);
     console.log('======================');
 }
@@ -337,34 +334,43 @@ function updateCellDisplay(cell, result, type = 'predicted') {
     const player2 = normalizePlayerName(cell.dataset.player2);
     const block = cell.dataset.block;
     const matchKey = `${block}-${player1}-${player2}`;
-    
+    const isReverse = cell.dataset.reverse === 'true';
+
+    // 下三角のセルでは結果を反転して表示
+    const reverseResult = (res) => {
+        if (!isReverse || !res) return res;
+        if (res === 'win') return 'lose';
+        if (res === 'lose') return 'win';
+        return res; // draw
+    };
+
     const confirmedResultDiv = cell.querySelector('.confirmed-result');
     const predictedResultDiv = cell.querySelector('.predicted-result');
-    
+
     // 確定データの表示
     if (confirmedResults[matchKey]) {
-        const confirmedResult = confirmedResults[matchKey];
+        const confirmedResult = reverseResult(confirmedResults[matchKey]);
         confirmedResultDiv.innerHTML = getResultIcon(confirmedResult);
         confirmedResultDiv.className = 'confirmed-result';
         if(confirmedResult) confirmedResultDiv.classList.add(confirmedResult);
-        
+
         // セルを確定済みにする（クリック不可）
         cell.classList.add('confirmed-cell');
         cell.classList.remove('clickable-cell');
     } else {
         confirmedResultDiv.innerHTML = '';
         confirmedResultDiv.className = 'confirmed-result';
-        
+
         // セルをクリック可能にする
         cell.classList.remove('confirmed-cell');
         if (!cell.classList.contains('clickable-cell')) {
             cell.classList.add('clickable-cell');
         }
     }
-    
+
     // 予想データの表示（predictedResultsから取得）
-    const predictedResult = predictedResults[matchKey];
-    
+    const predictedResult = reverseResult(predictedResults[matchKey]);
+
     if (predictedResult) {
         predictedResultDiv.innerHTML = getResultIcon(predictedResult);
         predictedResultDiv.className = 'predicted-result';
@@ -1410,10 +1416,13 @@ function generateBlockTable(blockId, blockData) {
                 if (match) {
                     const [t1, t2, date, venue] = match;
                     // 総当たり戦なので全セルをクリック可能にする
-                    // 上三角（i < j）は通常の順序、下三角（i > j）は逆順にしてデータ属性を設定
-                    const player1 = (i < j) ? team1 : team2;
-                    const player2 = (i < j) ? team2 : team1;
-                    const dataAttrs = `data-player1="${player1}" data-player2="${player2}" data-block="${blockId}"`;
+                    // ただし、data属性は常にマッチデータの順序（t1, t2）で統一
+                    const player1 = teams[t1];
+                    const player2 = teams[t2];
+                    // 下三角のセルには data-reverse="true" を設定（結果を反転表示するため）
+                    const isLowerTriangle = (i > j);
+                    const reverseAttr = isLowerTriangle ? 'data-reverse="true"' : '';
+                    const dataAttrs = `data-player1="${player1}" data-player2="${player2}" data-block="${blockId}" ${reverseAttr}`;
 
                     html += `<td class="match-info clickable-cell" ${dataAttrs}>
                         <div class="date">${date}</div>
