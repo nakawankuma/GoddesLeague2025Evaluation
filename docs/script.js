@@ -1389,6 +1389,10 @@ function generateVenueScheduleTable() {
         });
     });
 
+    // トーナメント試合の日程を追加（決勝トーナメント）
+    venueMap.set('8.20', '後楽園');  // 予選・準々決勝
+    venueMap.set('8.23', '大田区');  // 準決勝・決勝
+
     // 日付でソート
     const sortedDates = Array.from(venueMap.keys()).sort((a, b) => {
         const [monthA, dayA] = a.split('.').map(Number);
