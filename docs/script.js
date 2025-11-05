@@ -303,6 +303,17 @@ function toggleMatchResult(cell) {
         const testP2 = normalizePlayerName(testCell.dataset.player2);
         const testBlock = testCell.dataset.block;
 
+        // デバッグ: 最初の3つのセルと、マッチしそうなセルをログ出力
+        const shouldLog = (testP1 && testP1.includes('なつぱい')) || (testP2 && testP2.includes('なつぱい'));
+        if (shouldLog) {
+            console.log('  チェック中:', { testP1, testP2, testBlock });
+            console.log('  比較:', {
+                'testP1 === player2': testP1 === player2,
+                'testP2 === player1': testP2 === player1,
+                'testBlock === block': testBlock === block
+            });
+        }
+
         if (testP1 === player2 && testP2 === player1 && testBlock === block) {
             opponentCell = testCell;
             console.log('対応するセルを発見:', testP1, testP2);
