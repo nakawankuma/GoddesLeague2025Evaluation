@@ -507,116 +507,32 @@ function determineBlockRankings(block) {
 
 /**
  * トーナメントブラケットの選手情報を更新
- * @param {string} block - ブロックID（red-a, red-b, blue-a, blue-b）
- * @param {Array<Object>} rankings - 順位データ
+ * @param {string} block - ブロックID（red-goddesses / blue-goddesses）
+ * @param {Array<Object>} rankings - 順位データ（上位3チーム）
  */
 function updateTournamentBracket(block, rankings) {
-    const blockShort = block.split('-')[0]; // red or blue
-    const blockSub = block.split('-')[1]; // a or b
+    const blockShort = block.replace('-goddesses', ''); // 'red' or 'blue'
 
-    if (!blockShort || !blockSub) {
-        console.error(`無効なブロックID: ${block}`);
-        return;
-    }
+    // 上位3チームのみトーナメントに反映
+    const topThree = rankings.slice(0, 3);
 
-    const playerMap = {};
-    rankings.forEach(p => {
-        playerMap[`${blockShort}-${blockSub}-${p.rank}`] = p.name;
-    });
+    topThree.forEach((player, index) => {
+        const rank = index + 1; // 1, 2, 3
+        const rankElement = document.getElementById(`bracket-${blockShort}-${rank}-rank`);
 
-    // 選手名と順位を更新
-    const ranks = [1, 2, 3];
-    ranks.forEach(rank => {
-        const nameElement = document.getElementById(`bracket-${blockShort}-${blockSub}-${rank}-name`);
-        const rankElement = document.getElementById(`bracket-${blockShort}-${blockSub}-${rank}-rank`);
-
-        if (!nameElement || !rankElement) {
-            console.warn(`トーナメント要素が見つかりません: bracket-${blockShort}-${blockSub}-${rank}`);
-            return;
-        }
-
-        const player = rankings.find(p => p.rank === rank);
-        if (player) {
-            // ブロック名と選手名を両方表示
-            nameElement.textContent = `${blockShort.toUpperCase()} STARS ${blockSub.toUpperCase()}`;
+        if (rankElement) {
             rankElement.textContent = `${rank}位 ${player.name}`;
         } else {
-            nameElement.textContent = `${blockShort.toUpperCase()} STARS ${blockSub.toUpperCase()}`;
-            rankElement.textContent = `${rank}位`;
+            console.warn(`トーナメント要素が見つかりません: bracket-${blockShort}-${rank}-rank`);
         }
     });
-}
 
-/**
- * サブブロック（A/B）のチームを取得
- * @param {string} block - ブロックID（red-goddesses / blue-goddesses）
- * @param {string} subBlock - サブブロック（'a' / 'b'）
- * @returns {Array<string>} チーム名の配列
- */
-function getSubBlockTeams(block, subBlock) {
-    const players = getPlayersInBlock(block);
-    // 最初の4チームがA、後の4チームがB
-    if (subBlock === 'a') {
-        return players.slice(0, 4);
-    } else {
-        return players.slice(4, 8);
-    }
-}
-
-/**
- * サブブロック内の順位を決定
- * @param {string} block - ブロックID
- * @param {string} subBlock - サブブロック（'a' / 'b'）
- * @returns {Array<Object>} 順位データ [{name, points, rank, opponents}, ...]
- */
-function determineSubBlockRankings(block, subBlock) {
-    const players = getSubBlockTeams(block, subBlock);
-    const playerStats = players.map(player => ({
-        name: player,
-        points: 0,
-        opponents: {}
-    }));
-
-    // サブブロック内の対戦のみを集計
-    playerStats.forEach(stat => {
-        let points = 0;
-        Object.keys(matchResults).forEach(key => {
-            if (key.startsWith(`${block}-${stat.name}-`)) {
-                // 対戦相手がサブブロック内のチームか確認
-                const opponent = normalizePlayerName(key.split(`${block}-${stat.name}-`)[1]);
-                if (players.includes(opponent)) {
-                    const result = matchResults[key];
-                    if (result === 'win') points += 2;
-                    if (result === 'draw') points += 1;
-                    stat.opponents[opponent] = result;
-                }
-            }
-        });
-        stat.points = points;
-    });
-
-    // 勝ち点でソート、同点の場合は直接対決
-    playerStats.sort((a, b) => {
-        if (b.points !== a.points) {
-            return b.points - a.points;
-        }
-        const directResult = a.opponents[b.name];
-        if (directResult === 'win') return -1;
-        if (directResult === 'lose') return 1;
-        return 0;
-    });
-
-    // 順位を付与
-    playerStats.forEach((stat, index) => {
-        stat.rank = index + 1;
-    });
-
-    return playerStats;
+    console.log(`${blockShort.toUpperCase()} GODDESSES の順位をトーナメントに反映しました:`, topThree);
 }
 
 /**
  * ブロック完了時に順位を計算してトーナメントに反映
- * @param {string} block - ブロックID
+ * @param {string} block - ブロックID（red-goddesses / blue-goddesses）
  */
 function checkCompletionAndRank(block) {
     const statusEl = document.getElementById(`${block}-status`);
@@ -627,62 +543,20 @@ function checkCompletionAndRank(block) {
         return;
     }
 
-    // サブブロックごとに順位を計算してトーナメントに反映
-    const blockShort = block.replace('-goddesses', ''); // 'red' or 'blue'
+    // 8チーム全体で全試合が完了しているか確認
+    if (isBlockComplete(block)) {
+        console.log(`${block}の全試合が完了しました。順位を計算します。`);
+        const rankings = determineBlockRankings(block);
 
-    // サブブロックA
-    const subBlockAComplete = isSubBlockComplete(block, 'a');
-    if (subBlockAComplete) {
-        const rankingsA = determineSubBlockRankings(block, 'a');
-        updateTournamentBracket(`${blockShort}-a`, rankingsA);
-        console.log(`${blockShort}-a の順位が確定しました:`, rankingsA);
-    }
+        // トーナメントブラケットに反映（上位3チーム）
+        updateTournamentBracket(block, rankings);
 
-    // サブブロックB
-    const subBlockBComplete = isSubBlockComplete(block, 'b');
-    if (subBlockBComplete) {
-        const rankingsB = determineSubBlockRankings(block, 'b');
-        updateTournamentBracket(`${blockShort}-b`, rankingsB);
-        console.log(`${blockShort}-b の順位が確定しました:`, rankingsB);
-    }
-
-    // 全体の完了状態を表示
-    if (subBlockAComplete && subBlockBComplete) {
         statusEl.textContent = 'ブロック順位確定';
         statusEl.classList.add('confirmed');
     } else {
         statusEl.textContent = '';
         statusEl.classList.remove('confirmed');
     }
-}
-
-/**
- * サブブロックが完了しているか確認
- * @param {string} block - ブロックID
- * @param {string} subBlock - サブブロック（'a' / 'b'）
- * @returns {boolean} 完了しているか
- */
-function isSubBlockComplete(block, subBlock) {
-    const players = getSubBlockTeams(block, subBlock);
-    const totalMatches = players.length * (players.length - 1) / 2;
-    let completedMatches = 0;
-    const checkedMatches = new Set();
-
-    players.forEach(p1 => {
-        players.forEach(p2 => {
-            if (p1 === p2) return;
-            const matchKey = [p1, p2].sort().join('-');
-            if (checkedMatches.has(matchKey)) return;
-
-            const key = `${block}-${p1}-${p2}`;
-            if (matchResults[key]) {
-                completedMatches++;
-            }
-            checkedMatches.add(matchKey);
-        });
-    });
-
-    return completedMatches >= totalMatches;
 }
 
 function showPlayerSchedule(playerName) {
@@ -796,134 +670,82 @@ function showVenueSchedule(venueName, date) {
     // トーナメント試合の日程と会場
     const tournamentSlots = {
         '11.29': [
-            // 予選4試合
-            { type: '予選', p1_id: 'bracket-red-a-3-name', p2_id: 'bracket-red-b-2-name', venue: '大阪', match_id: 'red-prelim1' },
-            { type: '予選', p1_id: 'bracket-red-a-2-name', p2_id: 'bracket-red-b-3-name', venue: '大阪', match_id: 'red-prelim2' },
-            { type: '予選', p1_id: 'bracket-blue-a-3-name', p2_id: 'bracket-blue-b-2-name', venue: '大阪', match_id: 'blue-prelim1' },
-            { type: '予選', p1_id: 'bracket-blue-a-2-name', p2_id: 'bracket-blue-b-3-name', venue: '大阪', match_id: 'blue-prelim2' },
-            // 準々決勝4試合
-            { type: '準々決勝', p1_id: 'bracket-red-a-1-name', p2_id: 'red-prelim1-winner', venue: '大阪', match_id: 'red-qf1' },
-            { type: '準々決勝', p1_id: 'bracket-red-b-1-name', p2_id: 'red-prelim2-winner', venue: '大阪', match_id: 'red-qf2' },
-            { type: '準々決勝', p1_id: 'bracket-blue-a-1-name', p2_id: 'blue-prelim1-winner', venue: '大阪', match_id: 'blue-qf1' },
-            { type: '準々決勝', p1_id: 'bracket-blue-b-1-name', p2_id: 'blue-prelim2-winner', venue: '大阪', match_id: 'blue-qf2' },
+            // 2位/3位決定戦
+            { type: '2位/3位決定戦', p1_rank: 2, p2_rank: 3, block: 'blue', venue: '大阪', match_id: 'blue-semifinal' },
+            { type: '2位/3位決定戦', p1_rank: 2, p2_rank: 3, block: 'red', venue: '大阪', match_id: 'red-semifinal' },
+            // 1位決定戦
+            { type: '1位決定戦', p1_rank: 1, p2_id: 'blue-semifinal-winner', block: 'blue', venue: '大阪', match_id: 'blue-final' },
+            { type: '1位決定戦', p1_rank: 1, p2_id: 'red-semifinal-winner', block: 'red', venue: '大阪', match_id: 'red-final' },
         ],
         '11.30': [
-            // 準決勝2試合
-            { type: '準決勝', p1_id: 'red-qf1-winner', p2_id: 'red-qf2-winner', venue: '浜松', match_id: 'red-sf' },
-            { type: '準決勝', p1_id: 'blue-qf1-winner', p2_id: 'blue-qf2-winner', venue: '浜松', match_id: 'blue-sf' },
-            // 決勝1試合
-            { type: '決勝', p1_id: 'red-sf-winner', p2_id: 'blue-sf-winner', venue: '浜松', match_id: 'final' },
+            // 優勝決定戦
+            { type: '優勝決定戦', p1_id: 'blue-final-winner', p2_id: 'red-final-winner', venue: '浜松', match_id: 'championship' },
         ]
     };
 
-    const tournamentWinners = {};
+    // トーナメント試合の表示用ヘルパー関数
+    const getTournamentPlayerDisplay = (slot, isPlayer1) => {
+        const block = slot.block;
+        const rankKey = isPlayer1 ? 'p1_rank' : 'p2_rank';
+        const idKey = isPlayer1 ? 'p1_id' : 'p2_id';
 
-    // 予選と準々決勝の勝者を計算
-    Object.keys(tournamentSlots).forEach(slotDate => {
-        tournamentSlots[slotDate].forEach(slot => {
-            if (slot.type === '予選' || slot.type === '準々決勝' || slot.type === '準決勝' || slot.type === '決勝') {
-                const p1_name = document.getElementById(slot.p1_id) ? document.getElementById(slot.p1_id).textContent : slot.p1_id;
-                const p2_name = document.getElementById(slot.p2_id) ? document.getElementById(slot.p2_id).textContent : slot.p2_id;
-                const matchKey = `tournament-${slot.match_id}`;
-                const result = matchResults[matchKey];
+        // ランク指定の場合
+        if (slot[rankKey]) {
+            const rank = slot[rankKey];
+            const rankElement = document.getElementById(`bracket-${block}-${rank}-rank`);
+            if (rankElement && rankElement.textContent) {
+                return `${block.toUpperCase()} ${rankElement.textContent}`;
+            }
+            return `${block.toUpperCase()} ${rank}位`;
+        }
 
-                if (result) {
-                    if (result === 'win') tournamentWinners[slot.match_id + '-winner'] = p1_name;
-                    else if (result === 'lose') tournamentWinners[slot.match_id + '-winner'] = p2_name;
-                    else tournamentWinners[slot.match_id + '-winner'] = '引き分け';
+        // 勝者ID指定の場合
+        if (slot[idKey]) {
+            const winnerId = slot[idKey];
+            const matchKey = `tournament-${winnerId.replace('-winner', '')}`;
+            const result = matchResults[matchKey];
+
+            if (result) {
+                // 前の試合の勝者を取得
+                const prevSlots = Object.values(tournamentSlots).flat();
+                const prevSlot = prevSlots.find(s => s.match_id === winnerId.replace('-winner', ''));
+                if (prevSlot) {
+                    if (result === 'win') {
+                        return getTournamentPlayerDisplay(prevSlot, true);
+                    } else if (result === 'lose') {
+                        return getTournamentPlayerDisplay(prevSlot, false);
+                    }
                 }
             }
-        });
-    });
+
+            // 勝者未定の場合
+            if (winnerId === 'blue-semifinal-winner') return 'BLUE 2位/3位決定戦の勝者';
+            if (winnerId === 'red-semifinal-winner') return 'RED 2位/3位決定戦の勝者';
+            if (winnerId === 'blue-final-winner') return 'BLUE 最終1位';
+            if (winnerId === 'red-final-winner') return 'RED 最終1位';
+            return winnerId;
+        }
+
+        return '未定';
+    };
 
     if (tournamentSlots[date]) {
         tournamentSlots[date].forEach(slot => {
             if (slot.venue === venueName) {
-                let p1_display, p2_display;
-                
-                // ブラケット要素から表示名を取得
-                if (document.getElementById(slot.p1_id)) {
-                    const nameElement = document.getElementById(slot.p1_id);
-                    const rankElement = document.getElementById(slot.p1_id.replace('-name', '-rank'));
-                    
-                    if (rankElement && rankElement.textContent.includes(' ')) {
-                        // "1位 選手名" の場合：「ブロック名 順位 (選手名)」
-                        const playerName = rankElement.textContent.split(' ').slice(1).join(' ');
-                        const rank = rankElement.textContent.split(' ')[0];
-                        p1_display = `${nameElement.textContent} ${rank} (${playerName})`;
-                    } else {
-                        // 順位が確定していない場合：「ブロック名 順位」
-                        p1_display = `${nameElement.textContent} ${rankElement.textContent}`;
-                    }
-                } else {
-                    // 予選勝者や準々決勝勝者などの場合
-                    if (slot.p1_id.includes('winner')) {
-                        // 実際の勝者名を取得
-                        const actualWinner = getActualTournamentWinner(slot.p1_id);
-                        if (actualWinner) {
-                            p1_display = actualWinner;
-                        } else {
-                            // 勝者が未定の場合の表示
-                            if (slot.p1_id === 'blue-prelim1-winner') p1_display = 'Blue Stars A 3位 vs Blue Stars B 2位の勝者';
-                            else if (slot.p1_id === 'blue-prelim2-winner') p1_display = 'Blue Stars A 2位 vs Blue Stars B 3位の勝者';
-                            else if (slot.p1_id === 'red-prelim1-winner') p1_display = 'Red Stars A 3位 vs Red Stars B 2位の勝者';
-                            else if (slot.p1_id === 'red-prelim2-winner') p1_display = 'Red Stars A 2位 vs Red Stars B 3位の勝者';
-                            else if (slot.p1_id === 'blue-qf1-winner') p1_display = 'Blue側準々決勝1の勝者';
-                            else if (slot.p1_id === 'blue-qf2-winner') p1_display = 'Blue側準々決勝2の勝者';
-                            else if (slot.p1_id === 'red-qf1-winner') p1_display = 'Red側準々決勝1の勝者';
-                            else if (slot.p1_id === 'red-qf2-winner') p1_display = 'Red側準々決勝2の勝者';
-                            else if (slot.p1_id === 'blue-sf-winner') p1_display = 'Blue側準決勝の勝者';
-                            else if (slot.p1_id === 'red-sf-winner') p1_display = 'Red側準決勝の勝者';
-                            else p1_display = slot.p1_id;
-                        }
-                    } else {
-                        p1_display = slot.p1_id;
-                    }
-                }
-                
-                if (document.getElementById(slot.p2_id)) {
-                    const nameElement = document.getElementById(slot.p2_id);
-                    const rankElement = document.getElementById(slot.p2_id.replace('-name', '-rank'));
-                    
-                    if (rankElement && rankElement.textContent.includes(' ')) {
-                        // "1位 選手名" の場合：「ブロック名 順位 (選手名)」
-                        const playerName = rankElement.textContent.split(' ').slice(1).join(' ');
-                        const rank = rankElement.textContent.split(' ')[0];
-                        p2_display = `${nameElement.textContent} ${rank} (${playerName})`;
-                    } else {
-                        // 順位が確定していない場合：「ブロック名 順位」
-                        p2_display = `${nameElement.textContent} ${rankElement.textContent}`;
-                    }
-                } else {
-                    // 予選勝者や準々決勝勝者などの場合
-                    if (slot.p2_id.includes('winner')) {
-                        // 実際の勝者名を取得
-                        const actualWinner = getActualTournamentWinner(slot.p2_id);
-                        if (actualWinner) {
-                            p2_display = actualWinner;
-                        } else {
-                            // 勝者が未定の場合の表示
-                            if (slot.p2_id === 'blue-prelim1-winner') p2_display = 'Blue Stars A 3位 vs Blue Stars B 2位の勝者';
-                            else if (slot.p2_id === 'blue-prelim2-winner') p2_display = 'Blue Stars A 2位 vs Blue Stars B 3位の勝者';
-                            else if (slot.p2_id === 'red-prelim1-winner') p2_display = 'Red Stars A 3位 vs Red Stars B 2位の勝者';
-                            else if (slot.p2_id === 'red-prelim2-winner') p2_display = 'Red Stars A 2位 vs Red Stars B 3位の勝者';
-                            else if (slot.p2_id === 'blue-qf1-winner') p2_display = 'Blue側準々決勝1の勝者';
-                            else if (slot.p2_id === 'blue-qf2-winner') p2_display = 'Blue側準々決勝2の勝者';
-                            else if (slot.p2_id === 'red-qf1-winner') p2_display = 'Red側準々決勝1の勝者';
-                            else if (slot.p2_id === 'red-qf2-winner') p2_display = 'Red側準々決勝2の勝者';
-                            else if (slot.p2_id === 'blue-sf-winner') p2_display = 'Blue側準決勝の勝者';
-                            else if (slot.p2_id === 'red-sf-winner') p2_display = 'Red側準決勝の勝者';
-                            else p2_display = slot.p2_id;
-                        }
-                    } else {
-                        p2_display = slot.p2_id;
-                    }
-                }
-
+                const p1_display = getTournamentPlayerDisplay(slot, true);
+                const p2_display = getTournamentPlayerDisplay(slot, false);
                 const matchKey = `tournament-${slot.match_id}`;
                 const result = matchResults[matchKey];
 
-                matches.push({ player1: p1_display, player2: p2_display, result: result, date: date, block: 'トーナメント', type: slot.type, match_id: slot.match_id });
+                matches.push({
+                    player1: p1_display,
+                    player2: p2_display,
+                    result: result,
+                    date: date,
+                    block: 'トーナメント',
+                    type: slot.type,
+                    match_id: slot.match_id
+                });
             }
         });
     }

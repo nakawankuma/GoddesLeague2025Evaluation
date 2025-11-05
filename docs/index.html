@@ -57,7 +57,7 @@
 
             
             <div style="width: 100%; margin: 20px auto; background: rgba(255, 255, 255, 0.95); border-radius: 10px; padding: 20px; overflow-x: auto;">
-                <svg id="tournament-svg" viewBox="0 0 1400 500" style="width: 100%; min-width: 1400px; height: auto;" xmlns="http://www.w3.org/2000/svg">
+                <svg id="tournament-svg" viewBox="0 0 1200 400" style="width: 100%; min-width: 1200px; height: auto;" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
@@ -73,154 +73,76 @@
                         </linearGradient>
                     </defs>
 
-                    <!-- Blue Side -->
-                    <!-- Initial Player Boxes -->
-                    <rect x="20" y="35" width="160" height="30" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
-                    <text id="bracket-blue-a-1-name" x="100" y="47" text-anchor="middle" fill="white" font-size="10" font-weight="bold">BLUE GODDESSES</text>
-                    <text id="bracket-blue-a-1-rank" x="100" y="58" text-anchor="middle" fill="white" font-size="10" font-weight="bold">1位</text>
+                    <!-- BLUE側 -->
+                    <!-- 初期配置 -->
+                    <rect x="20" y="50" width="180" height="35" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
+                    <text x="110" y="65" text-anchor="middle" fill="white" font-size="12" font-weight="bold">BLUE GODDESSES</text>
+                    <text id="bracket-blue-1-rank" x="110" y="80" text-anchor="middle" fill="white" font-size="11">1位</text>
 
-                    <rect x="20" y="105" width="160" height="30" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
-                    <text id="bracket-blue-a-3-name" x="100" y="117" text-anchor="middle" fill="white" font-size="10" font-weight="bold">BLUE GODDESSES</text>
-                    <text id="bracket-blue-a-3-rank" x="100" y="128" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3位</text>
+                    <rect x="20" y="140" width="180" height="35" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
+                    <text x="110" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="bold">BLUE GODDESSES</text>
+                    <text id="bracket-blue-2-rank" x="110" y="170" text-anchor="middle" fill="white" font-size="11">2位</text>
 
-                    <rect x="20" y="155" width="160" height="30" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
-                    <text id="bracket-blue-b-2-name" x="100" y="167" text-anchor="middle" fill="white" font-size="10" font-weight="bold">BLUE GODDESSES</text>
-                    <text id="bracket-blue-b-2-rank" x="100" y="178" text-anchor="middle" fill="white" font-size="10" font-weight="bold">2位</text>
+                    <rect x="20" y="195" width="180" height="35" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
+                    <text x="110" y="210" text-anchor="middle" fill="white" font-size="12" font-weight="bold">BLUE GODDESSES</text>
+                    <text id="bracket-blue-3-rank" x="110" y="225" text-anchor="middle" fill="white" font-size="11">3位</text>
 
-                    <rect x="20" y="225" width="160" height="30" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
-                    <text id="bracket-blue-a-2-name" x="100" y="237" text-anchor="middle" fill="white" font-size="10" font-weight="bold">BLUE GODDESSES</text>
-                    <text id="bracket-blue-a-2-rank" x="100" y="248" text-anchor="middle" fill="white" font-size="10" font-weight="bold">2位</text>
+                    <!-- 2位 vs 3位決定戦 -->
+                    <line x1="200" y1="157.5" x2="270" y2="157.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="200" y1="212.5" x2="270" y2="212.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="270" y1="157.5" x2="270" y2="212.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="270" y1="185" x2="340" y2="185" stroke="#ffd700" stroke-width="3"/>
+                    <rect id="blue-semifinal-box" x="270" y="170" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-semifinal"/>
+                    <text x="305" y="185" text-anchor="middle" fill="white" font-size="9">2位/3位</text>
+                    <text id="blue-semifinal-result" x="305" y="195" text-anchor="middle" fill="white" font-size="10"></text>
 
-                    <rect x="20" y="275" width="160" height="30" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
-                    <text id="bracket-blue-b-3-name" x="100" y="287" text-anchor="middle" fill="white" font-size="10" font-weight="bold">BLUE GODDESSES</text>
-                    <text id="bracket-blue-b-3-rank" x="100" y="298" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3位</text>
+                    <!-- 1位 vs 2位/3位勝者 -->
+                    <line x1="200" y1="67.5" x2="410" y2="67.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="340" y1="185" x2="410" y2="185" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="410" y1="67.5" x2="410" y2="185" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="410" y1="126" x2="480" y2="126" stroke="#ffd700" stroke-width="3"/>
+                    <rect id="blue-final-box" x="410" y="111" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-final"/>
+                    <text x="445" y="126" text-anchor="middle" fill="white" font-size="9">BLUE決勝</text>
+                    <text id="blue-final-result" x="445" y="136" text-anchor="middle" fill="white" font-size="10"></text>
 
-                    <rect x="20" y="345" width="160" height="30" fill="url(#blueGradient)" stroke="#1976D2" stroke-width="2" rx="5"/>
-                    <text id="bracket-blue-b-1-name" x="100" y="357" text-anchor="middle" fill="white" font-size="10" font-weight="bold">BLUE GODDESSES</text>
-                    <text id="bracket-blue-b-1-rank" x="100" y="368" text-anchor="middle" fill="white" font-size="10" font-weight="bold">1位</text>
+                    <!-- RED側 -->
+                    <!-- 初期配置 -->
+                    <rect x="1000" y="50" width="180" height="35" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
+                    <text x="1090" y="65" text-anchor="middle" fill="white" font-size="12" font-weight="bold">RED GODDESSES</text>
+                    <text id="bracket-red-1-rank" x="1090" y="80" text-anchor="middle" fill="white" font-size="11">1位</text>
 
-                    <!-- Preliminary Match 1 (A3 vs B2) -->
-                    <line x1="180" y1="120" x2="250" y2="120" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="180" y1="170" x2="250" y2="170" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="250" y1="120" x2="250" y2="170" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="250" y1="145" x2="320" y2="145" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="blue-prelim1-box" x="250" y="130" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-prelim1"/>
-                    <text x="285" y="145" text-anchor="middle" fill="white" font-size="8">予選</text>
-                    <text id="blue-prelim1-result" x="285" y="155" text-anchor="middle" fill="white" font-size="10"></text>
+                    <rect x="1000" y="140" width="180" height="35" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
+                    <text x="1090" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="bold">RED GODDESSES</text>
+                    <text id="bracket-red-2-rank" x="1090" y="170" text-anchor="middle" fill="white" font-size="11">2位</text>
 
-                    <!-- Preliminary Match 2 (A2 vs B3) -->
-                    <line x1="180" y1="240" x2="250" y2="240" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="180" y1="290" x2="250" y2="290" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="250" y1="240" x2="250" y2="290" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="250" y1="265" x2="320" y2="265" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="blue-prelim2-box" x="250" y="250" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-prelim2"/>
-                    <text x="285" y="265" text-anchor="middle" fill="white" font-size="8">予選</text>
-                    <text id="blue-prelim2-result" x="285" y="275" text-anchor="middle" fill="white" font-size="10"></text>
+                    <rect x="1000" y="195" width="180" height="35" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
+                    <text x="1090" y="210" text-anchor="middle" fill="white" font-size="12" font-weight="bold">RED GODDESSES</text>
+                    <text id="bracket-red-3-rank" x="1090" y="225" text-anchor="middle" fill="white" font-size="11">3位</text>
 
-                    <!-- Quarter-Final 1 (A1 vs Winner of Prelim 1) -->
-                    <line x1="180" y1="50" x2="390" y2="50" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="320" y1="145" x2="390" y2="145" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="390" y1="50" x2="390" y2="145" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="390" y1="97.5" x2="460" y2="97.5" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="blue-qf1-box" x="390" y="82.5" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-qf1"/>
-                    <text x="425" y="95" text-anchor="middle" fill="white" font-size="8">準々決勝</text>
-                    <text id="blue-qf1-result" x="425" y="105" text-anchor="middle" fill="white" font-size="10"></text>
+                    <!-- 2位 vs 3位決定戦 -->
+                    <line x1="1000" y1="157.5" x2="930" y2="157.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="1000" y1="212.5" x2="930" y2="212.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="930" y1="157.5" x2="930" y2="212.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="930" y1="185" x2="860" y2="185" stroke="#ffd700" stroke-width="3"/>
+                    <rect id="red-semifinal-box" x="860" y="170" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-semifinal"/>
+                    <text x="895" y="185" text-anchor="middle" fill="white" font-size="9">2位/3位</text>
+                    <text id="red-semifinal-result" x="895" y="195" text-anchor="middle" fill="white" font-size="10"></text>
 
-                    <!-- Quarter-Final 2 (B1 vs Winner of Prelim 2) -->
-                    <line x1="180" y1="360" x2="390" y2="360" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="320" y1="265" x2="390" y2="265" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="390" y1="265" x2="390" y2="360" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="390" y1="312.5" x2="460" y2="312.5" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="blue-qf2-box" x="390" y="297.5" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-qf2"/>
-                    <text x="425" y="310" text-anchor="middle" fill="white" font-size="8">準々決勝</text>
-                    <text id="blue-qf2-result" x="425" y="320" text-anchor="middle" fill="white" font-size="10"></text>
+                    <!-- 1位 vs 2位/3位勝者 -->
+                    <line x1="1000" y1="67.5" x2="790" y2="67.5" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="860" y1="185" x2="790" y2="185" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="790" y1="67.5" x2="790" y2="185" stroke="#ffd700" stroke-width="3"/>
+                    <line x1="790" y1="126" x2="720" y2="126" stroke="#ffd700" stroke-width="3"/>
+                    <rect id="red-final-box" x="720" y="111" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-final"/>
+                    <text x="755" y="126" text-anchor="middle" fill="white" font-size="9">RED決勝</text>
+                    <text id="red-final-result" x="755" y="136" text-anchor="middle" fill="white" font-size="10"></text>
 
-                    <!-- Semi-Final 1 (Winner QF1 vs Winner QF2) -->
-                    <line x1="460" y1="97.5" x2="530" y2="97.5" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="460" y1="312.5" x2="530" y2="312.5" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="530" y1="97.5" x2="530" y2="312.5" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="530" y1="205" x2="600" y2="205" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="blue-sf-box" x="530" y="190" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="blue-sf"/>
-                    <text x="565" y="203" text-anchor="middle" fill="white" font-size="8">準決勝</text>
-                    <text id="blue-sf-result" x="565" y="213" text-anchor="middle" fill="white" font-size="10"></text>
-
-                    <!-- Red Side (Right) - Mirroring Blue Side -->
-                    <!-- Initial Player Boxes -->
-                    <rect x="1220" y="35" width="160" height="30" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
-                    <text id="bracket-red-a-1-name" x="1300" y="47" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RED GODDESSES</text>
-                    <text id="bracket-red-a-1-rank" x="1300" y="58" text-anchor="middle" fill="white" font-size="10" font-weight="bold">1位</text>
-
-                    <rect x="1220" y="105" width="160" height="30" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
-                    <text id="bracket-red-a-3-name" x="1300" y="117" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RED GODDESSES</text>
-                    <text id="bracket-red-a-3-rank" x="1300" y="128" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3位</text>
-
-                    <rect x="1220" y="155" width="160" height="30" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
-                    <text id="bracket-red-b-2-name" x="1300" y="167" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RED GODDESSES</text>
-                    <text id="bracket-red-b-2-rank" x="1300" y="178" text-anchor="middle" fill="white" font-size="10" font-weight="bold">2位</text>
-
-                    <rect x="1220" y="225" width="160" height="30" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
-                    <text id="bracket-red-a-2-name" x="1300" y="237" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RED GODDESSES</text>
-                    <text id="bracket-red-a-2-rank" x="1300" y="248" text-anchor="middle" fill="white" font-size="10" font-weight="bold">2位</text>
-
-                    <rect x="1220" y="275" width="160" height="30" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
-                    <text id="bracket-red-b-3-name" x="1300" y="287" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RED GODDESSES</text>
-                    <text id="bracket-red-b-3-rank" x="1300" y="298" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3位</text>
-
-                    <rect x="1220" y="345" width="160" height="30" fill="url(#redGradient)" stroke="#d32f2f" stroke-width="2" rx="5"/>
-                    <text id="bracket-red-b-1-name" x="1300" y="357" text-anchor="middle" fill="white" font-size="10" font-weight="bold">RED GODDESSES</text>
-                    <text id="bracket-red-b-1-rank" x="1300" y="368" text-anchor="middle" fill="white" font-size="10" font-weight="bold">1位</text>
-
-                    <!-- Preliminary Match 1 (A3 vs B2) -->
-                    <line x1="1220" y1="120" x2="1150" y2="120" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1220" y1="170" x2="1150" y2="170" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1150" y1="120" x2="1150" y2="170" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1150" y1="145" x2="1080" y2="145" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="red-prelim1-box" x="1080" y="130" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-prelim1"/>
-                    <text x="1115" y="145" text-anchor="middle" fill="white" font-size="8">予選</text>
-                    <text id="red-prelim1-result" x="1115" y="155" text-anchor="middle" fill="white" font-size="10"></text>
-
-                    <!-- Preliminary Match 2 (A2 vs B3) -->
-                    <line x1="1220" y1="240" x2="1150" y2="240" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1220" y1="290" x2="1150" y2="290" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1150" y1="240" x2="1150" y2="290" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1150" y1="265" x2="1080" y2="265" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="red-prelim2-box" x="1080" y="250" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-prelim2"/>
-                    <text x="1115" y="265" text-anchor="middle" fill="white" font-size="8">予選</text>
-                    <text id="red-prelim2-result" x="1115" y="275" text-anchor="middle" fill="white" font-size="10"></text>
-
-                    <!-- Quarter-Final 1 (A1 vs Winner of Prelim 1) -->
-                    <line x1="1220" y1="50" x2="1010" y2="50" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1080" y1="145" x2="1010" y2="145" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1010" y1="50" x2="1010" y2="145" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1010" y1="97.5" x2="940" y2="97.5" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="red-qf1-box" x="940" y="82.5" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-qf1"/>
-                    <text x="975" y="95" text-anchor="middle" fill="white" font-size="8">準々決勝</text>
-                    <text id="red-qf1-result" x="975" y="105" text-anchor="middle" fill="white" font-size="10"></text>
-
-                    <!-- Quarter-Final 2 (B1 vs Winner of Prelim 2) -->
-                    <line x1="1220" y1="360" x2="1010" y2="360" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1080" y1="265" x2="1010" y2="265" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1010" y1="265" x2="1010" y2="360" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="1010" y1="312.5" x2="940" y2="312.5" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="red-qf2-box" x="940" y="297.5" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-qf2"/>
-                    <text x="975" y="310" text-anchor="middle" fill="white" font-size="8">準々決勝</text>
-                    <text id="red-qf2-result" x="975" y="320" text-anchor="middle" fill="white" font-size="10"></text>
-
-                    <!-- Semi-Final 1 (Winner QF1 vs Winner QF2) -->
-                    <line x1="940" y1="97.5" x2="870" y2="97.5" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="940" y1="312.5" x2="870" y2="312.5" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="870" y1="97.5" x2="870" y2="312.5" stroke="#ffd700" stroke-width="3"/>
-                    <line x1="870" y1="205" x2="800" y2="205" stroke="#ffd700" stroke-width="3"/>
-                    <rect id="red-sf-box" x="800" y="190" width="70" height="30" fill="rgba(100,100,100,0.8)" stroke="#666" stroke-width="2" rx="4" class="tournament-match-box" data-match="red-sf"/>
-                    <text x="835" y="203" text-anchor="middle" fill="white" font-size="8">準決勝</text>
-                    <text id="red-sf-result" x="835" y="213" text-anchor="middle" fill="white" font-size="10"></text>
-
-                    <!-- Final Match -->
-                    <line x1="600" y1="205" x2="650" y2="205" stroke="url(#goldGradient)" stroke-width="4"/>
-                    <line x1="800" y1="205" x2="750" y2="205" stroke="url(#goldGradient)" stroke-width="4"/>
-                    <rect id="final-box" x="650" y="190" width="100" height="30" fill="url(#goldGradient)" stroke="#ff6f00" stroke-width="4" rx="10" class="tournament-match-box" data-match="final"/>
-                    <text x="700" y="203" text-anchor="middle" fill="#1a1a2e" font-size="10" font-weight="bold">FINAL</text>
-                    <text id="final-result" x="700" y="213" text-anchor="middle" fill="#1a1a2e" font-size="10"></text>
+                    <!-- 優勝決定戦 -->
+                    <line x1="480" y1="126" x2="550" y2="126" stroke="url(#goldGradient)" stroke-width="4"/>
+                    <line x1="720" y1="126" x2="650" y2="126" stroke="url(#goldGradient)" stroke-width="4"/>
+                    <rect id="championship-box" x="550" y="111" width="100" height="30" fill="url(#goldGradient)" stroke="#ff6f00" stroke-width="4" rx="10" class="tournament-match-box" data-match="championship"/>
+                    <text x="600" y="126" text-anchor="middle" fill="#1a1a2e" font-size="11" font-weight="bold">FINAL</text>
+                    <text id="championship-result" x="600" y="136" text-anchor="middle" fill="#1a1a2e" font-size="10"></text>
                 </svg>
             </div>
             
