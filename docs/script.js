@@ -442,18 +442,136 @@ function updateTournamentBracket(block, rankings) {
     });
 }
 
+/**
+ * サブブロック（A/B）のチームを取得
+ * @param {string} block - ブロックID（red-goddesses / blue-goddesses）
+ * @param {string} subBlock - サブブロック（'a' / 'b'）
+ * @returns {Array<string>} チーム名の配列
+ */
+function getSubBlockTeams(block, subBlock) {
+    const players = getPlayersInBlock(block);
+    // 最初の4チームがA、後の4チームがB
+    if (subBlock === 'a') {
+        return players.slice(0, 4);
+    } else {
+        return players.slice(4, 8);
+    }
+}
+
+/**
+ * サブブロック内の順位を決定
+ * @param {string} block - ブロックID
+ * @param {string} subBlock - サブブロック（'a' / 'b'）
+ * @returns {Array<Object>} 順位データ [{name, points, rank, opponents}, ...]
+ */
+function determineSubBlockRankings(block, subBlock) {
+    const players = getSubBlockTeams(block, subBlock);
+    const playerStats = players.map(player => ({
+        name: player,
+        points: 0,
+        opponents: {}
+    }));
+
+    // サブブロック内の対戦のみを集計
+    playerStats.forEach(stat => {
+        let points = 0;
+        Object.keys(matchResults).forEach(key => {
+            if (key.startsWith(`${block}-${stat.name}-`)) {
+                // 対戦相手がサブブロック内のチームか確認
+                const opponent = normalizePlayerName(key.split(`${block}-${stat.name}-`)[1]);
+                if (players.includes(opponent)) {
+                    const result = matchResults[key];
+                    if (result === 'win') points += 2;
+                    if (result === 'draw') points += 1;
+                    stat.opponents[opponent] = result;
+                }
+            }
+        });
+        stat.points = points;
+    });
+
+    // 勝ち点でソート、同点の場合は直接対決
+    playerStats.sort((a, b) => {
+        if (b.points !== a.points) {
+            return b.points - a.points;
+        }
+        const directResult = a.opponents[b.name];
+        if (directResult === 'win') return -1;
+        if (directResult === 'lose') return 1;
+        return 0;
+    });
+
+    // 順位を付与
+    playerStats.forEach((stat, index) => {
+        stat.rank = index + 1;
+    });
+
+    return playerStats;
+}
+
+/**
+ * ブロック完了時に順位を計算してトーナメントに反映
+ * @param {string} block - ブロックID
+ */
 function checkCompletionAndRank(block) {
     const statusEl = document.getElementById(`${block}-status`);
-    if (isBlockComplete(block)) {
-        console.log(`${block}の全試合が完了しました。順位を計算します。`);
-        const rankings = determineBlockRankings(block);
-        updateTournamentBracket(block, rankings);
+
+    // サブブロックごとに順位を計算してトーナメントに反映
+    const blockShort = block.replace('-goddesses', ''); // 'red' or 'blue'
+
+    // サブブロックA
+    const subBlockAComplete = isSubBlockComplete(block, 'a');
+    if (subBlockAComplete) {
+        const rankingsA = determineSubBlockRankings(block, 'a');
+        updateTournamentBracket(`${blockShort}-a`, rankingsA);
+        console.log(`${blockShort}-a の順位が確定しました:`, rankingsA);
+    }
+
+    // サブブロックB
+    const subBlockBComplete = isSubBlockComplete(block, 'b');
+    if (subBlockBComplete) {
+        const rankingsB = determineSubBlockRankings(block, 'b');
+        updateTournamentBracket(`${blockShort}-b`, rankingsB);
+        console.log(`${blockShort}-b の順位が確定しました:`, rankingsB);
+    }
+
+    // 全体の完了状態を表示
+    if (subBlockAComplete && subBlockBComplete) {
         statusEl.textContent = 'ブロック順位確定';
         statusEl.classList.add('confirmed');
     } else {
         statusEl.textContent = '';
         statusEl.classList.remove('confirmed');
     }
+}
+
+/**
+ * サブブロックが完了しているか確認
+ * @param {string} block - ブロックID
+ * @param {string} subBlock - サブブロック（'a' / 'b'）
+ * @returns {boolean} 完了しているか
+ */
+function isSubBlockComplete(block, subBlock) {
+    const players = getSubBlockTeams(block, subBlock);
+    const totalMatches = players.length * (players.length - 1) / 2;
+    let completedMatches = 0;
+    const checkedMatches = new Set();
+
+    players.forEach(p1 => {
+        players.forEach(p2 => {
+            if (p1 === p2) return;
+            const matchKey = [p1, p2].sort().join('-');
+            if (checkedMatches.has(matchKey)) return;
+
+            const key = `${block}-${p1}-${p2}`;
+            if (matchResults[key]) {
+                completedMatches++;
+            }
+            checkedMatches.add(matchKey);
+        });
+    });
+
+    return completedMatches >= totalMatches;
 }
 
 function showPlayerSchedule(playerName) {
@@ -1259,6 +1377,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // 初期状態で優勝者表示をチェック
     updateChampionDisplay();
+
+    // 初期状態でトーナメントブラケットを更新（確定データがある場合）
+    blocks.forEach(block => {
+        checkCompletionAndRank(block);
+    });
 
     // テーブルを動的生成
     generateTables();
