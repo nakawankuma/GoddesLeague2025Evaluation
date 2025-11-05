@@ -516,6 +516,12 @@ function determineSubBlockRankings(block, subBlock) {
 function checkCompletionAndRank(block) {
     const statusEl = document.getElementById(`${block}-status`);
 
+    // status要素が存在しない場合は処理をスキップ（テーブル生成前の呼び出しを防ぐ）
+    if (!statusEl) {
+        console.warn(`status要素が見つかりません: ${block}-status`);
+        return;
+    }
+
     // サブブロックごとに順位を計算してトーナメントに反映
     const blockShort = block.replace('-goddesses', ''); // 'red' or 'blue'
 
@@ -1372,6 +1378,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         uploadInput.value = ''; // Reset input
     });
     
+    // テーブルを動的生成（status要素を含むDOMを先に生成）
+    generateTables();
+
     // 確定データ読み込み後にテーブルを更新
     refreshAllTables();
 
@@ -1379,12 +1388,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     updateChampionDisplay();
 
     // 初期状態でトーナメントブラケットを更新（確定データがある場合）
+    // generateTables()の後に呼び出す必要がある（status要素が生成されている必要があるため）
     blocks.forEach(block => {
         checkCompletionAndRank(block);
     });
-
-    // テーブルを動的生成
-    generateTables();
 
     // 日付・会場対応表を動的生成
     generateVenueScheduleTable();
