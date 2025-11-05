@@ -1334,18 +1334,19 @@ function generateBlockTable(blockId, blockData) {
                 const match = findMatch(matches, i, j);
                 if (match) {
                     const [t1, t2, date, venue] = match;
-                    const isClickable = (i < j); // 上三角のみクリック可能
-                    const clickableClass = isClickable ? 'clickable-cell' : '';
-                    const dataAttrs = isClickable ?
-                        `data-player1="${team1}" data-player2="${team2}" data-block="${blockId}"` : '';
+                    // 総当たり戦なので全セルをクリック可能にする
+                    // 上三角（i < j）は通常の順序、下三角（i > j）は逆順にしてデータ属性を設定
+                    const player1 = (i < j) ? team1 : team2;
+                    const player2 = (i < j) ? team2 : team1;
+                    const dataAttrs = `data-player1="${player1}" data-player2="${player2}" data-block="${blockId}"`;
 
-                    html += `<td class="match-info ${clickableClass}" ${dataAttrs}>
+                    html += `<td class="match-info clickable-cell" ${dataAttrs}>
                         <div class="date">${date}</div>
                         <div class="venue">${venue}</div>
-                        ${isClickable ? `<div class="match-results">
+                        <div class="match-results">
                             <div class="confirmed-result"></div>
                             <div class="predicted-result"></div>
-                        </div>` : ''}
+                        </div>
                     </td>`;
                 } else {
                     html += `<td class="match-info"></td>`;
