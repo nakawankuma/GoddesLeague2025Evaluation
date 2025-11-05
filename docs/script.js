@@ -1474,6 +1474,10 @@ function generateVenueScheduleTable() {
         });
     });
 
+    // トーナメント試合の日程を追加（決勝トーナメント）
+    venueMap.set('11.29', '大阪');  // RED/BLUE順位決定戦
+    venueMap.set('11.30', '浜松');  // 最終決戦（RED1位 vs BLUE1位）
+
     // 日付でソート
     const sortedDates = Array.from(venueMap.keys()).sort((a, b) => {
         const [monthA, dayA] = a.split('.').map(Number);
