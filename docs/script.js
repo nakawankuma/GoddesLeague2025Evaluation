@@ -220,6 +220,13 @@ function toggleMatchResult(cell) {
     const matchKey = `${block}-${player1}-${player2}`;
     const reverseKey = `${block}-${player2}-${player1}`;
 
+    console.log('=== toggleMatchResult ===');
+    console.log('クリックされたセル:', { player1, player2, block });
+    console.log('matchKey:', matchKey);
+    console.log('reverseKey:', reverseKey);
+    console.log('predictedResults[matchKey]:', predictedResults[matchKey]);
+    console.log('predictedResults[reverseKey]:', predictedResults[reverseKey]);
+
     // 確定済み結果は変更不可（両方のキーをチェック）
     if (confirmedResults[matchKey] || confirmedResults[reverseKey]) {
         console.log('確定済みの結果は変更できません:', matchKey);
@@ -237,12 +244,16 @@ function toggleMatchResult(cell) {
 
     if (predictedResults[matchKey]) {
         currentResult = predictedResults[matchKey];
+        console.log('matchKeyから取得:', currentResult);
     } else if (predictedResults[reverseKey]) {
         // reverseKeyに結果がある場合は、結果を反転して使用
         const reverseResult = predictedResults[reverseKey];
         if (reverseResult === 'win') currentResult = 'lose';
         else if (reverseResult === 'lose') currentResult = 'win';
         else currentResult = reverseResult; // draw
+        console.log('reverseKeyから取得して反転:', reverseResult, '->', currentResult);
+    } else {
+        console.log('既存結果なし');
     }
 
     // 次の状態に遷移
@@ -253,6 +264,7 @@ function toggleMatchResult(cell) {
         case 'draw': newResult = 'lose'; break;
         default: newResult = null; break;
     }
+    console.log('新しい結果:', currentResult, '->', newResult);
 
     // 結果を保存（常にmatchKeyとreverseKeyの両方に保存）
     if (newResult) {
@@ -267,20 +279,30 @@ function toggleMatchResult(cell) {
 
         predictedResults[reverseKey] = oppositeResult;
         matchResults[reverseKey] = oppositeResult;
+        console.log('保存:', matchKey, '=', newResult, ',', reverseKey, '=', oppositeResult);
     } else {
         // 結果を削除
         delete predictedResults[matchKey];
         delete predictedResults[reverseKey];
         delete matchResults[matchKey];
         delete matchResults[reverseKey];
+        console.log('結果を削除');
     }
 
+    console.log('セルを更新:', matchKey, matchResults[matchKey]);
     updateCellDisplay(cell, matchResults[matchKey], 'predicted');
+
     const opponentCell = document.querySelector(`[data-player1="${player2}"][data-player2="${player1}"][data-block="${block}"]`);
+    console.log('対応するセルを検索:', `[data-player1="${player2}"][data-player2="${player1}"][data-block="${block}"]`);
+    console.log('対応するセル:', opponentCell);
     if (opponentCell) {
+        console.log('対応するセルを更新:', reverseKey, matchResults[reverseKey]);
         updateCellDisplay(opponentCell, matchResults[reverseKey], 'predicted');
+    } else {
+        console.log('対応するセルが見つかりません！');
     }
     updatePoints(block);
+    console.log('======================');
 }
 
 function updateCellDisplay(cell, result, type = 'predicted') {
