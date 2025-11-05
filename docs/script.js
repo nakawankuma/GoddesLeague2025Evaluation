@@ -219,9 +219,9 @@ function toggleMatchResult(cell) {
     const block = cell.dataset.block;
     const matchKey = `${block}-${player1}-${player2}`;
     const reverseKey = `${block}-${player2}-${player1}`;
-    
-    // 確定済み結果は変更不可
-    if (confirmedResults[matchKey]) {
+
+    // 確定済み結果は変更不可（両方のキーをチェック）
+    if (confirmedResults[matchKey] || confirmedResults[reverseKey]) {
         console.log('確定済みの結果は変更できません:', matchKey);
         return;
     }
@@ -231,24 +231,50 @@ function toggleMatchResult(cell) {
         statusEl.classList.remove('confirmed');
         statusEl.textContent = '';
     }
-    
-    let currentResult = predictedResults[matchKey] || 'none';
-    
-    switch (currentResult) {
-        case 'none': predictedResults[matchKey] = 'win'; predictedResults[reverseKey] = 'lose'; break;
-        case 'win': predictedResults[matchKey] = 'draw'; predictedResults[reverseKey] = 'draw'; break;
-        case 'draw': predictedResults[matchKey] = 'lose'; predictedResults[reverseKey] = 'win'; break;
-        default: delete predictedResults[matchKey]; delete predictedResults[reverseKey]; break;
+
+    // 既存の結果を取得（matchKeyまたはreverseKeyから）
+    let currentResult = 'none';
+
+    if (predictedResults[matchKey]) {
+        currentResult = predictedResults[matchKey];
+    } else if (predictedResults[reverseKey]) {
+        // reverseKeyに結果がある場合は、結果を反転して使用
+        const reverseResult = predictedResults[reverseKey];
+        if (reverseResult === 'win') currentResult = 'lose';
+        else if (reverseResult === 'lose') currentResult = 'win';
+        else currentResult = reverseResult; // draw
     }
-    
-    // matchResultsも更新（互換性のため）
-    matchResults[matchKey] = predictedResults[matchKey];
-    matchResults[reverseKey] = predictedResults[reverseKey];
-    if (!predictedResults[matchKey]) {
+
+    // 次の状態に遷移
+    let newResult;
+    switch (currentResult) {
+        case 'none': newResult = 'win'; break;
+        case 'win': newResult = 'draw'; break;
+        case 'draw': newResult = 'lose'; break;
+        default: newResult = null; break;
+    }
+
+    // 結果を保存（常にmatchKeyとreverseKeyの両方に保存）
+    if (newResult) {
+        predictedResults[matchKey] = newResult;
+        matchResults[matchKey] = newResult;
+
+        // 逆の結果も保存
+        let oppositeResult;
+        if (newResult === 'win') oppositeResult = 'lose';
+        else if (newResult === 'lose') oppositeResult = 'win';
+        else oppositeResult = 'draw'; // draw
+
+        predictedResults[reverseKey] = oppositeResult;
+        matchResults[reverseKey] = oppositeResult;
+    } else {
+        // 結果を削除
+        delete predictedResults[matchKey];
+        delete predictedResults[reverseKey];
         delete matchResults[matchKey];
         delete matchResults[reverseKey];
     }
-    
+
     updateCellDisplay(cell, matchResults[matchKey], 'predicted');
     const opponentCell = document.querySelector(`[data-player1="${player2}"][data-player2="${player1}"][data-block="${block}"]`);
     if (opponentCell) {
