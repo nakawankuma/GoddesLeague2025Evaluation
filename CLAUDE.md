@@ -3,10 +3,10 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-This is a web application for managing the FIVESTAR GP 2025 tournament bracket system. It's a single-page HTML application that allows users to:
-- View tournament brackets for 4 blocks (Red Stars A/B, Blue Stars A/B)
+This is a web application for managing the Goddes Tag League 2025 tournament bracket system. It's a single-page HTML application that allows users to:
+- View tournament brackets for 2 blocks (Red Goddesses, Blue Goddesses)
 - Track match results by clicking on match cells
-- View individual player schedules via modal dialogs
+- View individual team schedules via modal dialogs
 - Export/import match results as JSON files
 - Display tournament progression and finals bracket
 
@@ -61,13 +61,13 @@ Since this is a static HTML application:
 
 ### アプリケーション固有の構造
 - **Main Data Structure**: `matchResults` オブジェクトがマッチ結果を管理
-- **Key Format**: `${block}-${player1}-${player2}` 形式でマッチを識別
+- **Key Format**: `${block}-${team1}-${team2}` 形式でマッチを識別
 - **Result Values**: 'win', 'draw', 'lose', undefined (未決定)
-- **Block IDs**: 'red-a', 'red-b', 'blue-a', 'blue-b'
+- **Block IDs**: 'red-goddesses', 'blue-goddesses'
 - **UI Components**:
   - タブ切り替え機能（全表示/タブ表示）
   - クリック可能なマッチセル（.clickable-cell）
-  - プレイヤー名クリックでスケジュール表示
+  - チーム名クリックでスケジュール表示
   - JSON形式でのエクスポート/インポート機能
 
 ### ドキュメント生成

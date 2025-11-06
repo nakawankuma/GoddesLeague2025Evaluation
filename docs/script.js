@@ -157,7 +157,7 @@ function normalizeMatchKey(key) {
         return key;
     }
     
-    // ブロック名を取得（red-a, red-b, blue-a, blue-b）
+    // ブロック名を取得（red-goddesses, blue-goddesses）
     let remainingKey = key;
     let block = '';
     
@@ -197,7 +197,7 @@ function showAllContent() {
 function showTabView() {
     document.getElementById('tabs').style.display = 'flex';
     document.querySelectorAll('.content').forEach(content => content.classList.add('hidden'));
-    document.getElementById('red-a').classList.remove('hidden');
+    document.getElementById('red-goddesses').classList.remove('hidden');
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelector('.tab').classList.add('active');
     document.querySelectorAll('.toggle-button').forEach(btn => btn.classList.remove('active'));
@@ -711,10 +711,10 @@ function showVenueSchedule(venueName, date) {
                             p1_display = actualWinner;
                         } else {
                             // 勝者が未定の場合の表示
-                            if (slot.p1_id === 'blue-prelim1-winner') p1_display = 'Blue Stars A 3位 vs Blue Stars B 2位の勝者';
-                            else if (slot.p1_id === 'blue-prelim2-winner') p1_display = 'Blue Stars A 2位 vs Blue Stars B 3位の勝者';
-                            else if (slot.p1_id === 'red-prelim1-winner') p1_display = 'Red Stars A 3位 vs Red Stars B 2位の勝者';
-                            else if (slot.p1_id === 'red-prelim2-winner') p1_display = 'Red Stars A 2位 vs Red Stars B 3位の勝者';
+                            if (slot.p1_id === 'blue-prelim1-winner') p1_display = 'Blue Goddesses 3位 vs Blue Goddesses 2位の勝者';
+                            else if (slot.p1_id === 'blue-prelim2-winner') p1_display = 'Blue Goddesses 2位 vs Blue Goddesses 3位の勝者';
+                            else if (slot.p1_id === 'red-prelim1-winner') p1_display = 'Red Goddesses 3位 vs Red Goddesses 2位の勝者';
+                            else if (slot.p1_id === 'red-prelim2-winner') p1_display = 'Red Goddesses 2位 vs Red Goddesses 3位の勝者';
                             else if (slot.p1_id === 'blue-qf1-winner') p1_display = 'Blue側準々決勝1の勝者';
                             else if (slot.p1_id === 'blue-qf2-winner') p1_display = 'Blue側準々決勝2の勝者';
                             else if (slot.p1_id === 'red-qf1-winner') p1_display = 'Red側準々決勝1の勝者';
@@ -750,10 +750,10 @@ function showVenueSchedule(venueName, date) {
                             p2_display = actualWinner;
                         } else {
                             // 勝者が未定の場合の表示
-                            if (slot.p2_id === 'blue-prelim1-winner') p2_display = 'Blue Stars A 3位 vs Blue Stars B 2位の勝者';
-                            else if (slot.p2_id === 'blue-prelim2-winner') p2_display = 'Blue Stars A 2位 vs Blue Stars B 3位の勝者';
-                            else if (slot.p2_id === 'red-prelim1-winner') p2_display = 'Red Stars A 3位 vs Red Stars B 2位の勝者';
-                            else if (slot.p2_id === 'red-prelim2-winner') p2_display = 'Red Stars A 2位 vs Red Stars B 3位の勝者';
+                            if (slot.p2_id === 'blue-prelim1-winner') p2_display = 'Blue Goddesses 3位 vs Blue Goddesses 2位の勝者';
+                            else if (slot.p2_id === 'blue-prelim2-winner') p2_display = 'Blue Goddesses 2位 vs Blue Goddesses 3位の勝者';
+                            else if (slot.p2_id === 'red-prelim1-winner') p2_display = 'Red Goddesses 3位 vs Red Goddesses 2位の勝者';
+                            else if (slot.p2_id === 'red-prelim2-winner') p2_display = 'Red Goddesses 2位 vs Red Goddesses 3位の勝者';
                             else if (slot.p2_id === 'blue-qf1-winner') p2_display = 'Blue側準々決勝1の勝者';
                             else if (slot.p2_id === 'blue-qf2-winner') p2_display = 'Blue側準々決勝2の勝者';
                             else if (slot.p2_id === 'red-qf1-winner') p2_display = 'Red側準々決勝1の勝者';
