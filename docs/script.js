@@ -4,7 +4,7 @@ const tournamentData = {
         title: 'RED GODDESSES',
         teams: [
             '刀羅ナツコ&琉悪夏',
-            'なつぱい&安納サオリ',
+            'なつぽい&安納サオリ',
             '水森由菜&星来芽依',
             '妃南&八神蘭奈',
             '月山和香&梨杏',
